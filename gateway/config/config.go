@@ -46,6 +46,8 @@ type Log struct {
 
 type MySQL struct {
 	DSN          string
+	AutoMigrate  bool // run GORM AutoMigrate on startup
+	LogSQL       bool // log every SQL statement (debug level); otherwise only errors and slow queries
 	MaxIdleConns int
 	MaxOpenConns int
 	MaxLifetime  int // minutes
@@ -94,6 +96,8 @@ func Load() (*Config, error) {
 		},
 		MySQL: MySQL{
 			DSN:          l.required("MYSQL_DSN"),
+			AutoMigrate:  l.bool("MYSQL_AUTO_MIGRATE", true),
+			LogSQL:       l.bool("MYSQL_LOG_SQL", false),
 			MaxIdleConns: l.int("MYSQL_MAX_IDLE_CONNS", 100),
 			MaxOpenConns: l.int("MYSQL_MAX_OPEN_CONNS", 500),
 			MaxLifetime:  l.int("MYSQL_MAX_LIFETIME", 120),

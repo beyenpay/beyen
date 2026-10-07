@@ -12,20 +12,25 @@ import (
 	"time"
 
 	"github.com/beyenpay/beyen/gateway/config"
+	"github.com/beyenpay/beyen/gateway/infra/db"
 	"github.com/beyenpay/x/logger"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gorm.io/gorm"
 )
 
 // App owns every long-lived resource and knows how to start and stop them.
 type App struct {
 	cfg     *config.Config
+	db      *gorm.DB
+	rdb     *redis.Client
 	server  *http.Server
 	closers []func() error // released in reverse order of registration
 }
 
-// New initializes resources in dependency order: logger first, then (later)
-// MySQL and Redis, then the HTTP server. If a step fails, everything created
+// New initializes resources in dependency order: logger, MySQL (+ migration),
+// Redis, then the HTTP server. If a step fails, everything created
 // before it is closed before returning.
 func New(cfg *config.Config) (*App, error) {
 	a := &App{cfg: cfg}
@@ -35,13 +40,32 @@ func New(cfg *config.Config) (*App, error) {
 	}
 	a.onClose(logger.Close)
 
-	// Later, one block per resource, e.g.:
-	//   db, err := initMySQL(cfg.MySQL)
-	//   if err != nil {
-	//       a.Close()
-	//       return nil, err
-	//   }
-	//   a.onClose(db.Close)
+	// gdb, not db: the name db is the imported package.
+	gdb, err := db.NewMySQL(cfg.MySQL)
+	if err != nil {
+		a.Close()
+		return nil, err
+	}
+	a.db = gdb
+	a.onClose(func() error { return db.CloseMySQL(gdb) })
+	logger.Info("mysql connected")
+
+	if cfg.MySQL.AutoMigrate {
+		if err := migrate(gdb); err != nil {
+			a.Close()
+			return nil, err
+		}
+		logger.Info("mysql auto migrate done")
+	}
+
+	rdb, err := db.NewRedis(cfg.Redis)
+	if err != nil {
+		a.Close()
+		return nil, err
+	}
+	a.rdb = rdb
+	a.onClose(rdb.Close)
+	logger.Info("redis connected")
 
 	// Bridge net/http's internal errors (TLS handshake, bad conns...) into zap.
 	stdLog, err := zap.NewStdLogAt(logger.Zap(), zapcore.ErrorLevel)
