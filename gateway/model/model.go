@@ -4,7 +4,7 @@ package model
 func All() []any {
 	return []any{
 		&User{},
-		&Role{},
-		&UserRole{},
+		&Project{},
+		&ProjectMember{},
 	}
 }

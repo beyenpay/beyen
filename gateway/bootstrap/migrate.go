@@ -15,7 +15,7 @@ import (
 // migrate runs AutoMigrate under a cross-instance lock. Instances starting
 // together queue up, and every run after the first is a no-op.
 // The timeout only bounds acquiring the lock, not the migration itself.
-// Models are listed in model.All(); built-in rows are seeded after the schema.
+// Models are listed in model.All().
 func migrate(gdb *gorm.DB) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
@@ -28,6 +28,6 @@ func migrate(gdb *gorm.DB) error {
 		if err := quiet.AutoMigrate(model.All()...); err != nil {
 			return fmt.Errorf("auto migrate: %w", err)
 		}
-		return seedRoles(quiet)
+		return nil
 	})
 }
