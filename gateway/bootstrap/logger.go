@@ -7,8 +7,8 @@ import (
 	"github.com/beyenpay/x/logger"
 )
 
-// initLogger configures the package-level logger from cfg.
-func initLogger(cfg config.Log) error {
+// InitLogger configures the package-level logger from cfg.
+func InitLogger(cfg config.Log) error {
 	err := logger.Init(&logger.Config{
 		Level:          cfg.Level,
 		Dir:            cfg.Dir,

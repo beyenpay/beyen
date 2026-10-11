@@ -35,7 +35,7 @@ type App struct {
 func New(cfg *config.Config) (*App, error) {
 	a := &App{cfg: cfg}
 
-	if err := initLogger(cfg.Log); err != nil {
+	if err := InitLogger(cfg.Log); err != nil {
 		return nil, err
 	}
 	a.onClose(logger.Close)
@@ -76,7 +76,7 @@ func New(cfg *config.Config) (*App, error) {
 
 	a.server = &http.Server{
 		Addr:              ":" + strconv.Itoa(cfg.App.Port),
-		Handler:           newGin(cfg),
+		Handler:           buildHandler(cfg, gdb, rdb),
 		ReadHeaderTimeout: 10 * time.Second,
 		ErrorLog:          stdLog,
 	}

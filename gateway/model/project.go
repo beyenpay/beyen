@@ -6,12 +6,13 @@ type ProjectStatus int
 const (
 	ProjectStatusActive   ProjectStatus = 1
 	ProjectStatusDisabled ProjectStatus = 2 // frozen by a platform admin
+	ProjectStatusDeleted  ProjectStatus = 3 // deleted
 )
 
 type Project struct {
 	ID        int           `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name      string        `json:"name" gorm:"size:128;not null"`
-	Status    ProjectStatus `json:"status" gorm:"not null;default:1;comment:1 active, 2 disabled"`
+	Status    ProjectStatus `json:"status" gorm:"not null;default:1;comment:1 active, 2 disabled, 3 deleted"`
 	CreatedAt int64         `json:"created_at" gorm:"autoCreateTime"` // unix seconds
 	UpdatedAt int64         `json:"updated_at" gorm:"autoUpdateTime"` // unix seconds
 }

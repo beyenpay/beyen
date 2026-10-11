@@ -3,9 +3,12 @@ package config
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -16,18 +19,23 @@ const (
 	EnvProd = "prod"
 )
 
+// appNameRe keeps APP_NAME safe to use as the first segment of every Redis key.
+var appNameRe = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
+
 // Config holds all settings, grouped by module.
 type Config struct {
-	App   App
-	Log   Log
-	MySQL MySQL
-	Redis Redis
+	App     App
+	Log     Log
+	MySQL   MySQL
+	Redis   Redis
+	Session Session
 }
 
 type App struct {
-	Name string
-	Port int
-	Env  string // dev | prod
+	Name      string
+	Port      int
+	Env       string // dev | prod
+	PublicURL string // scheme://host[:port] that users open in the browser, no trailing slash
 }
 
 // Log mirrors the fields of github.com/beyenpay/x/logger.Config that we expose.
@@ -61,8 +69,22 @@ type Redis struct {
 	MaxIdle  int
 }
 
+// Session controls console login sessions.
+type Session struct {
+	IdleDays     int // a session expires after this many days without activity
+	AbsoluteDays int // hard cap counted from login, however active the session is
+	MaxPerUser   int // beyond this many sessions the oldest is evicted
+}
+
+func (s Session) Idle() time.Duration     { return time.Duration(s.IdleDays) * 24 * time.Hour }
+func (s Session) Absolute() time.Duration { return time.Duration(s.AbsoluteDays) * 24 * time.Hour }
+
 func (c *Config) IsDev() bool  { return c.App.Env == EnvDev }
 func (c *Config) IsProd() bool { return c.App.Env == EnvProd }
+
+// SecureCookie reports whether cookies get the Secure flag. It follows the
+// public URL scheme, so http://localhost works in dev and https works in prod.
+func (c *Config) SecureCookie() bool { return strings.HasPrefix(c.App.PublicURL, "https://") }
 
 // Load reads .env (optional) and the process environment, applies defaults and
 // validates. Call it once at startup and pass the result down explicitly.
@@ -78,9 +100,10 @@ func Load() (*Config, error) {
 
 	cfg := &Config{
 		App: App{
-			Name: l.str("APP_NAME", "beyen"),
-			Port: l.int("APP_PORT", 8020),
-			Env:  l.str("APP_ENV", EnvProd), // safest default
+			Name:      l.str("APP_NAME", "beyen"),
+			Port:      l.int("APP_PORT", 8020),
+			Env:       l.str("APP_ENV", EnvProd), // safest default
+			PublicURL: l.required("APP_PUBLIC_URL"),
 		},
 		Log: Log{
 			Level:          l.str("LOG_LEVEL", ""),
@@ -109,6 +132,11 @@ func Load() (*Config, error) {
 			MinIdle:  l.int("REDIS_MIN_IDLE", 10),
 			MaxIdle:  l.int("REDIS_MAX_IDLE", 50),
 		},
+		Session: Session{
+			IdleDays:     l.int("SESSION_IDLE_DAYS", 7),
+			AbsoluteDays: l.int("SESSION_ABSOLUTE_DAYS", 30),
+			MaxPerUser:   l.int("SESSION_MAX_PER_USER", 5),
+		},
 	}
 
 	cfg.validate(l)
@@ -125,6 +153,24 @@ func (c *Config) validate(l *loader) {
 	}
 	if c.App.Port < 1 || c.App.Port > 65535 {
 		l.fail("APP_PORT out of range: %d", c.App.Port)
+	}
+	if !appNameRe.MatchString(c.App.Name) {
+		l.fail("APP_NAME must match %s, got %q", appNameRe, c.App.Name)
+	}
+	if c.App.PublicURL != "" { // an empty value was already reported by required()
+		c.App.PublicURL = strings.ToLower(strings.TrimRight(c.App.PublicURL, "/"))
+		u, err := url.Parse(c.App.PublicURL)
+		if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" ||
+			u.Path != "" || u.RawQuery != "" || u.Fragment != "" {
+			l.fail("APP_PUBLIC_URL must look like https://host[:port], got %q", c.App.PublicURL)
+		}
+	}
+	if c.Session.IdleDays < 1 || c.Session.AbsoluteDays < c.Session.IdleDays {
+		l.fail("SESSION_ABSOLUTE_DAYS (%d) must not be less than SESSION_IDLE_DAYS (%d), which must be at least 1",
+			c.Session.AbsoluteDays, c.Session.IdleDays)
+	}
+	if c.Session.MaxPerUser < 1 {
+		l.fail("SESSION_MAX_PER_USER must be at least 1, got %d", c.Session.MaxPerUser)
 	}
 	if c.MySQL.MaxOpenConns < c.MySQL.MaxIdleConns {
 		l.fail("MYSQL_MAX_OPEN_CONNS (%d) must not be less than MYSQL_MAX_IDLE_CONNS (%d)",
