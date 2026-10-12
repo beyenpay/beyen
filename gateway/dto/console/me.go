@@ -10,11 +10,17 @@ type ProjectAccess struct {
 	Permissions []string `json:"permissions"`
 }
 
-// PermissionsResponse is what the frontend renders menus and buttons from.
+// PermissionsInfo is what the frontend renders menus and buttons from.
 // For an admin, System also holds every project.* permission, valid in any project.
-type PermissionsResponse struct {
+type PermissionsInfo struct {
 	System   []string        `json:"system"`
 	Projects []ProjectAccess `json:"projects"`
+}
+
+// MeResponse is the whole console session in one call.
+type MeResponse struct {
+	User        UserInfo        `json:"user"`
+	Permissions PermissionsInfo `json:"permissions"`
 }
 
 type SessionInfo struct {

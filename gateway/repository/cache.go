@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/beyenpay/x/logger"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 )
 
 // Cache is a small JSON cache-aside helper over Redis. Callers build the keys
@@ -51,4 +53,28 @@ func (c *Cache) Del(ctx context.Context, keys ...string) error {
 		return fmt.Errorf("cache del: %w", err)
 	}
 	return nil
+}
+
+// Remember is cache-aside in one call: return the cached value, or run load,
+// cache its result for ttl and return it. Redis trouble is logged and skipped,
+// because the cache is an optimization, not a dependency. A failed load is not
+// cached. Reading never extends the ttl, so an entry always dies on schedule
+// even if an invalidation was missed.
+func Remember[T any](ctx context.Context, c *Cache, key string, ttl time.Duration, load func(context.Context) (T, error)) (T, error) {
+	var v T
+	if ok, err := c.Get(ctx, key, &v); err != nil {
+		logger.Error("cache read failed", zap.String("key", key), zap.Error(err))
+	} else if ok {
+		return v, nil
+	}
+
+	v, err := load(ctx)
+	if err != nil {
+		var zero T
+		return zero, err
+	}
+	if err := c.Set(ctx, key, v, ttl); err != nil {
+		logger.Error("cache write failed", zap.String("key", key), zap.Error(err))
+	}
+	return v, nil
 }

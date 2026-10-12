@@ -63,3 +63,14 @@ func (r *ProjectMemberRepo) Create(ctx context.Context, m *model.ProjectMember) 
 	}
 	return nil
 }
+
+// ListUserIDs returns the id of every member of the project.
+func (r *ProjectMemberRepo) ListUserIDs(ctx context.Context, projectID int) ([]int, error) {
+	var ids []int
+	err := r.db.WithContext(ctx).Model(&model.ProjectMember{}).
+		Where("project_id = ?", projectID).Pluck("user_id", &ids).Error
+	if err != nil {
+		return nil, fmt.Errorf("list project member ids: %w", err)
+	}
+	return ids, nil
+}

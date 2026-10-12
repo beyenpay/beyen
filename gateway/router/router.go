@@ -15,6 +15,7 @@ import (
 	"github.com/beyenpay/beyen/gateway/middleware"
 	"github.com/beyenpay/beyen/gateway/service/auth"
 	"github.com/beyenpay/beyen/gateway/service/authz"
+	"github.com/beyenpay/beyen/gateway/service/me"
 	"github.com/beyenpay/beyen/gateway/service/user"
 	"github.com/beyenpay/x/logger"
 )
@@ -25,6 +26,7 @@ type Deps struct {
 	DB      *gorm.DB
 	Redis   *redis.Client
 	Auth    *auth.Service
+	Me      *me.Service
 	Authz   *authz.Service
 	User    *user.Service
 	Limiter *ratelimit.Limiter

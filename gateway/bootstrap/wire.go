@@ -13,6 +13,7 @@ import (
 	"github.com/beyenpay/beyen/gateway/router"
 	"github.com/beyenpay/beyen/gateway/service/auth"
 	"github.com/beyenpay/beyen/gateway/service/authz"
+	"github.com/beyenpay/beyen/gateway/service/me"
 	"github.com/beyenpay/beyen/gateway/service/user"
 )
 
@@ -23,6 +24,9 @@ func buildHandler(cfg *config.Config, gdb *gorm.DB, rdb *redis.Client) http.Hand
 	limiter := ratelimit.New(rdb, keys)
 
 	userRepo := repository.NewUserRepo(gdb)
+	projectRepo := repository.NewProjectRepo(gdb)
+	memberRepo := repository.NewProjectMemberRepo(gdb)
+	cache := repository.NewCache(rdb)
 
 	return router.New(router.Deps{
 		Config:  cfg,
@@ -31,11 +35,7 @@ func buildHandler(cfg *config.Config, gdb *gorm.DB, rdb *redis.Client) http.Hand
 		Limiter: limiter,
 		User:    user.New(userRepo),
 		Auth:    auth.New(cfg.Session, userRepo, repository.NewSessionRepo(rdb, keys), limiter),
-		Authz: authz.New(
-			repository.NewProjectRepo(gdb),
-			repository.NewProjectMemberRepo(gdb),
-			repository.NewCache(rdb),
-			keys,
-		),
+		Authz:   authz.New(projectRepo, memberRepo, cache, keys),
+		Me:      me.New(userRepo, memberRepo, cache, keys),
 	})
 }

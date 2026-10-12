@@ -72,50 +72,22 @@ func (s *Service) CheckProject(ctx context.Context, userID int, sysRole model.Sy
 	return nil
 }
 
-// ProjectAccess is the caller's standing in one project.
-type ProjectAccess struct {
-	ProjectID   int
-	Name        string
-	Status      model.ProjectStatus
-	Role        model.ProjectRole
-	Permissions []permission.Permission // empty unless the project is active
-}
-
-// Access is everything the frontend needs to render menus and buttons.
-type Access struct {
-	// System holds the permissions of the system role. For an admin it also
-	// contains every project permission, which apply to any project.
-	System   []permission.Permission
-	Projects []ProjectAccess
-}
-
-func (s *Service) Permissions(ctx context.Context, userID int, sysRole model.SystemRole) (*Access, error) {
-	rows, err := s.members.ListByUser(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	acc := &Access{
-		System:   permission.SystemRolePermissions(sysRole),
-		Projects: make([]ProjectAccess, len(rows)),
-	}
-	for i, r := range rows {
-		pa := ProjectAccess{ProjectID: r.ProjectID, Name: r.Name, Status: r.Status, Role: r.Role}
-		if r.Status == model.ProjectStatusActive {
-			pa.Permissions = permission.ProjectRolePermissions(r.Role)
-		}
-		acc.Projects[i] = pa
-	}
-	return acc, nil
-}
-
-// InvalidateProject must be called after a project's status changes.
+// InvalidateProject must be called after a project's name or status changes.
+// Every member's /me view shows the project, so their snapshots are dropped too.
 func (s *Service) InvalidateProject(ctx context.Context, projectID int) error {
-	return s.cache.Del(ctx, s.keys.ProjectInfo(projectID))
+	keys := []string{s.keys.ProjectInfo(projectID)}
+	ids, listErr := s.members.ListUserIDs(ctx, projectID)
+	for _, id := range ids {
+		keys = append(keys, s.keys.UserMe(id))
+	}
+	// Delete what we know even when listing failed; report both problems.
+	return errors.Join(s.cache.Del(ctx, keys...), listErr)
 }
 
 // InvalidateMember must be called after a membership is added, changed or removed.
+// The user's /me snapshot lists their projects and roles, so it goes too.
 func (s *Service) InvalidateMember(ctx context.Context, projectID, userID int) error {
-	return s.cache.Del(ctx, s.keys.ProjectMember(projectID, userID))
+	return s.cache.Del(ctx, s.keys.ProjectMember(projectID, userID), s.keys.UserMe(userID))
 }
 
 type projectEntry struct {

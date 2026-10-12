@@ -10,61 +10,46 @@ import (
 	"github.com/beyenpay/beyen/gateway/middleware"
 	"github.com/beyenpay/beyen/gateway/permission"
 	"github.com/beyenpay/beyen/gateway/pkg/response"
-	"github.com/beyenpay/beyen/gateway/service/authz"
-	"github.com/beyenpay/beyen/gateway/service/user"
+	"github.com/beyenpay/beyen/gateway/service/me"
 	"github.com/beyenpay/x/logger"
 )
 
-type MeHandler struct {
-	users *user.Service
-	authz *authz.Service
-}
+type MeHandler struct{ svc *me.Service }
 
-func NewMeHandler(users *user.Service, authz *authz.Service) *MeHandler {
-	return &MeHandler{users: users, authz: authz}
-}
+func NewMeHandler(svc *me.Service) *MeHandler { return &MeHandler{svc: svc} }
 
-// Profile handles GET /api/console/me.
-func (h *MeHandler) Profile(c *gin.Context) {
+// Get handles GET /api/console/me: the caller's profile and permissions in one call.
+func (h *MeHandler) Get(c *gin.Context) {
 	p := middleware.PrincipalFrom(c)
-	u, err := h.users.Get(c.Request.Context(), p.UserID)
+	v, err := h.svc.Get(c.Request.Context(), p.UserID, p.SystemRole)
 	switch {
 	case err == nil:
-	case errors.Is(err, user.ErrNotFound): // the session outlived the user
+	case errors.Is(err, me.ErrUserNotFound): // the session outlived the user
 		response.Fail(c, response.ErrUnauthorized)
 		return
 	default:
-		logger.Error("get profile failed", zap.Int("user_id", p.UserID), zap.Error(err))
-		response.Fail(c, response.ErrInternal)
-		return
-	}
-	response.Success(c, consoledto.NewUserInfo(u))
-}
-
-// Permissions handles GET /api/console/me/permissions.
-func (h *MeHandler) Permissions(c *gin.Context) {
-	p := middleware.PrincipalFrom(c)
-	acc, err := h.authz.Permissions(c.Request.Context(), p.UserID, p.SystemRole)
-	if err != nil {
-		logger.Error("get permissions failed", zap.Int("user_id", p.UserID), zap.Error(err))
+		logger.Error("get me failed", zap.Int("user_id", p.UserID), zap.Error(err))
 		response.Fail(c, response.ErrInternal)
 		return
 	}
 
-	resp := consoledto.PermissionsResponse{
-		System:   permStrings(acc.System),
-		Projects: make([]consoledto.ProjectAccess, len(acc.Projects)),
-	}
-	for i, pa := range acc.Projects {
-		resp.Projects[i] = consoledto.ProjectAccess{
-			ID:          pa.ProjectID,
-			Name:        pa.Name,
-			Status:      int(pa.Status),
-			Role:        string(pa.Role),
-			Permissions: permStrings(pa.Permissions),
+	projects := make([]consoledto.ProjectAccess, len(v.Projects))
+	for i, pv := range v.Projects {
+		projects[i] = consoledto.ProjectAccess{
+			ID:          pv.ID,
+			Name:        pv.Name,
+			Status:      int(pv.Status),
+			Role:        string(pv.Role),
+			Permissions: permStrings(pv.Permissions),
 		}
 	}
-	response.Success(c, resp)
+	response.Success(c, consoledto.MeResponse{
+		User: consoledto.UserInfo{ID: v.UserID, Email: v.Email, SystemRole: string(v.SystemRole)},
+		Permissions: consoledto.PermissionsInfo{
+			System:   permStrings(v.System),
+			Projects: projects,
+		},
+	})
 }
 
 // permStrings never returns nil, so JSON shows [] instead of null.

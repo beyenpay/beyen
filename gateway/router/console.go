@@ -21,7 +21,7 @@ import (
 func mountConsole(api *gin.RouterGroup, d Deps) {
 	cookie := middleware.NewSessionCookie(d.Config)
 	authH := consolehandler.NewAuthHandler(d.Auth, cookie)
-	meH := consolehandler.NewMeHandler(d.User, d.Authz)
+	meH := consolehandler.NewMeHandler(d.Me)
 	sessH := consolehandler.NewSessionHandler(d.Auth, cookie)
 
 	console := api.Group("/console",
@@ -46,8 +46,7 @@ func mountConsole(api *gin.RouterGroup, d Deps) {
 
 	// The caller's own data: login is enough, no permission needed.
 	me := authed.Group("/me")
-	me.GET("", meH.Profile)
-	me.GET("/permissions", meH.Permissions)
+	me.GET("", meH.Get)
 	me.GET("/sessions", sessH.List)
 	me.DELETE("/sessions", sessH.RevokeAll)
 	me.DELETE("/sessions/:id", sessH.Revoke)

@@ -32,3 +32,6 @@ func (k Keys) ProjectInfo(projectID int) string {
 func (k Keys) ProjectMember(projectID, userID int) string {
 	return k.prefix + ":project:member:" + strconv.Itoa(projectID) + ":" + strconv.Itoa(userID)
 }
+
+// UserMe caches the data behind GET /me for one user: email and project memberships.
+func (k Keys) UserMe(userID int) string { return k.prefix + ":user:me:" + strconv.Itoa(userID) }
