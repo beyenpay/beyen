@@ -1,0 +1,18 @@
+{
+  "welcome": "Welcome to the home page",
+  "landing": {
+    "badge": "Open source · MIT License",
+    "title": "Accept crypto payments, effortlessly.",
+    "subtitle": "Open-source, self-hosted, and strictly non-custodial crypto payment gateway.",
+    "cta": "Open Console",
+    "console": "Console",
+    "github": "View on GitHub",
+    "footer": "Built by <site>Beyen</site>. The source code is available on <repo>GitHub</repo>.",
+    "features": {
+      "zeroKeys": "Zero Private Keys",
+      "decimalMatching": "Smart Decimal Matching",
+      "multiChain": "Multi-Chain",
+      "rbac": "RBAC Permissions"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "welcome": "欢迎来到首页",
+  "landing": {
+    "badge": "开源 · MIT 协议",
+    "title": "轻松接收加密货币支付",
+    "subtitle": "开源、自部署，且严格非托管的加密货币支付网关",
+    "cta": "进入控制台",
+    "console": "控制台",
+    "github": "在 GitHub 查看",
+    "footer": "由 <site>Beyen</site> 构建。源代码已在 <repo>GitHub</repo> 开源。",
+    "features": {
+      "zeroKeys": "零私钥",
+      "decimalMatching": "智能尾数识别",
+      "multiChain": "多链支持",
+      "rbac": "角色权限"
+    }
+  }
+}

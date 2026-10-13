@@ -1,0 +1,16 @@
+{
+  // paths to your locale files
+  "i18n-ally.localesPaths": ["console/src/i18n/locales"],
+
+  // framework you are using
+  "i18n-ally.enabledFrameworks": ["react"],
+
+  // key style：nested
+  "i18n-ally.keystyle": "nested",
+
+  // default source language
+  "i18n-ally.sourceLanguage": "en",
+
+  // if you want to display the language names in a specific language
+  "i18n-ally.displayLanguage": "en"
+}
