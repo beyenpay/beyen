@@ -23,4 +23,13 @@ i18n
         },
     })
 
+// Keep <html lang> matching the language the page is actually rendered in.
+// Init has already finished (resources are bundled), so apply it once now,
+// then follow later switches.
+const syncHtmlLang = () => {
+    document.documentElement.lang = i18n.resolvedLanguage ?? i18n.language
+}
+syncHtmlLang()
+i18n.on("languageChanged", syncHtmlLang)
+
 export default i18n

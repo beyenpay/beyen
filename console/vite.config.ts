@@ -11,4 +11,11 @@ export default defineConfig({
       "@": resolve(import.meta.dirname, "./src"),
     },
   },
+  server: {
+    // Mirrors production, where nginx forwards /api to the gateway
+    // (port: APP_PORT in gateway/.env).
+    proxy: {
+      "/api": "http://localhost:8020",
+    },
+  },
 })

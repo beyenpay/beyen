@@ -11,5 +11,6 @@ export function useRepoStars(repo: string) {
         staleTime: HOUR,
         gcTime: 24 * HOUR,
         retry: false,
+        meta: { silent: true },
     })
 }

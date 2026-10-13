@@ -1,5 +1,27 @@
 {
   "welcome": "Welcome to the home page",
+  "errors": {
+    "fallback": "Something went wrong. Please try again.",
+    "codes": {
+      "NETWORK_ERROR": "Network error. Please check your connection.",
+      "TIMEOUT": "Request timed out. Please try again.",
+      "BAD_REQUEST": "Bad request.",
+      "INVALID_PARAMS": "Invalid parameters. Please check your input.",
+      "UNAUTHORIZED": "Your session has expired. Please sign in again.",
+      "PERMISSION_DENIED": "You don't have permission to do this.",
+      "NOT_FOUND": "The requested resource was not found.",
+      "ENDPOINT_NOT_FOUND": "The requested endpoint was not found.",
+      "METHOD_NOT_ALLOWED": "This operation is not allowed.",
+      "ALREADY_LOGGED_IN": "You are already signed in.",
+      "RATE_LIMITED": "Too many requests. Please slow down.",
+      "INTERNAL_ERROR": "Server error. Please try again later.",
+      "SERVICE_UNAVAILABLE": "Service is temporarily unavailable.",
+      "INVALID_CREDENTIALS": "Invalid email or password.",
+      "ACCOUNT_DISABLED": "This account is disabled.",
+      "TOO_MANY_ATTEMPTS": "Too many attempts. Please try again later.",
+      "PROJECT_DISABLED": "This project is disabled."
+    }
+  },
   "landing": {
     "badge": "Open source · MIT License",
     "title": "Accept crypto payments, effortlessly.",

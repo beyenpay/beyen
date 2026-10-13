@@ -1,5 +1,27 @@
 {
   "welcome": "欢迎来到首页",
+  "errors": {
+    "fallback": "出错了，请稍后重试。",
+    "codes": {
+      "NETWORK_ERROR": "网络异常，请检查网络连接。",
+      "TIMEOUT": "请求超时，请稍后重试。",
+      "BAD_REQUEST": "请求有误。",
+      "INVALID_PARAMS": "参数有误，请检查输入。",
+      "UNAUTHORIZED": "登录已过期，请重新登录。",
+      "PERMISSION_DENIED": "你没有权限执行此操作。",
+      "NOT_FOUND": "请求的资源不存在。",
+      "ENDPOINT_NOT_FOUND": "请求的接口不存在。",
+      "METHOD_NOT_ALLOWED": "不支持该操作。",
+      "ALREADY_LOGGED_IN": "你已登录。",
+      "RATE_LIMITED": "请求过于频繁，请稍后再试。",
+      "INTERNAL_ERROR": "服务器错误，请稍后重试。",
+      "SERVICE_UNAVAILABLE": "服务暂时不可用。",
+      "INVALID_CREDENTIALS": "邮箱或密码错误。",
+      "ACCOUNT_DISABLED": "该账号已被禁用。",
+      "TOO_MANY_ATTEMPTS": "尝试次数过多，请稍后再试。",
+      "PROJECT_DISABLED": "该项目已被禁用。"
+    }
+  },
   "landing": {
     "badge": "开源 · MIT 协议",
     "title": "轻松接收加密货币支付",
