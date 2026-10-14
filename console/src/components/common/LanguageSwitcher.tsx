@@ -35,6 +35,7 @@ export function LanguageSwitcher() {
                     <DropdownMenuItem
                         key={lang.code}
                         onClick={() => i18n.changeLanguage(lang.code)}
+                        className="h-7"
                     >
                         <span className="text-xs">{lang.label}</span>
                         {lang.code === current.code && (

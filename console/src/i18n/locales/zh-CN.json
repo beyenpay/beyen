@@ -22,14 +22,55 @@
       "PROJECT_DISABLED": "该项目已被禁用。"
     }
   },
+  "site": {
+    "console": "控制台",
+    "footer": "由 <site>Beyen</site> 构建。源代码已在 <repo>GitHub</repo> 开源。"
+  },
+  "login": {
+    "title": "登录",
+    "description": "输入邮箱和密码以进入控制台。",
+    "email": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "password": "密码",
+    "submit": "登录"
+  },
+  "validation": {
+    "emailInvalid": "请输入有效的邮箱地址。",
+    "passwordRequired": "请输入密码。",
+    "passwordTooLong": "密码过长。"
+  },
+  "errorPage": {
+    "backToConsole": "返回控制台",
+    "backToHome": "返回首页",
+    "retry": "重试",
+    "reload": "刷新页面",
+    "forbidden": {
+      "title": "无权访问",
+      "description": "你没有权限查看此页面。"
+    },
+    "notFound": {
+      "title": "页面不存在",
+      "description": "你访问的页面不存在。"
+    },
+    "projectDisabled": {
+      "title": "项目已被禁用",
+      "description": "该项目已被平台管理员禁用。"
+    },
+    "serverError": {
+      "title": "出错了",
+      "description": "无法加载你的登录状态，请重试。"
+    },
+    "unexpected": {
+      "title": "出错了",
+      "description": "页面加载失败。如果网站刚刚更新过，刷新页面通常可以解决。"
+    }
+  },
   "landing": {
     "badge": "开源 · MIT 协议",
     "title": "轻松接收加密货币支付",
     "subtitle": "开源、自部署，且严格非托管的加密货币支付网关",
     "cta": "进入控制台",
-    "console": "控制台",
     "github": "在 GitHub 查看",
-    "footer": "由 <site>Beyen</site> 构建。源代码已在 <repo>GitHub</repo> 开源。",
     "features": {
       "zeroKeys": "零私钥",
       "decimalMatching": "智能尾数识别",

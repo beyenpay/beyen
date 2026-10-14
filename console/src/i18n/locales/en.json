@@ -22,14 +22,55 @@
       "PROJECT_DISABLED": "This project is disabled."
     }
   },
+  "site": {
+    "console": "Console",
+    "footer": "Built by <site>Beyen</site>. The source code is available on <repo>GitHub</repo>."
+  },
+  "login": {
+    "title": "Sign in",
+    "description": "Enter your email and password to access the console.",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "submit": "Sign in"
+  },
+  "validation": {
+    "emailInvalid": "Enter a valid email address.",
+    "passwordRequired": "Enter your password.",
+    "passwordTooLong": "Password is too long."
+  },
+  "errorPage": {
+    "backToConsole": "Back to console",
+    "backToHome": "Back to home",
+    "retry": "Try again",
+    "reload": "Reload page",
+    "forbidden": {
+      "title": "Access denied",
+      "description": "You do not have permission to view this page."
+    },
+    "notFound": {
+      "title": "Page not found",
+      "description": "The page you are looking for does not exist."
+    },
+    "projectDisabled": {
+      "title": "Project disabled",
+      "description": "This project has been disabled by a platform administrator."
+    },
+    "serverError": {
+      "title": "Something went wrong",
+      "description": "We could not load your session. Please try again."
+    },
+    "unexpected": {
+      "title": "Something went wrong",
+      "description": "The page failed to load. If the site was just updated, reloading usually fixes it."
+    }
+  },
   "landing": {
     "badge": "Open source · MIT License",
     "title": "Accept crypto payments, effortlessly.",
     "subtitle": "Open-source, self-hosted, and strictly non-custodial crypto payment gateway.",
     "cta": "Open Console",
-    "console": "Console",
     "github": "View on GitHub",
-    "footer": "Built by <site>Beyen</site>. The source code is available on <repo>GitHub</repo>.",
     "features": {
       "zeroKeys": "Zero Private Keys",
       "decimalMatching": "Smart Decimal Matching",
