@@ -8,9 +8,14 @@ import {
 
 const PROJECTS = ["Default project", "bullbull"]
 
-export default function ProjectSwitcher() {
+export default function ProjectSwitcher({
+    current,
+    onChange,
+}: {
+    current: string
+    onChange: (name: string) => void
+}) {
     const [open, setOpen] = useState(false)
-    const [current, setCurrent] = useState(PROJECTS[0])
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -36,7 +41,7 @@ export default function ProjectSwitcher() {
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen((v) => !v)}
-                className={`flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-beyen-console-menu-hover ${open ? "bg-beyen-console-menu-hover" : ""
+                className={`flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-beyen-console-sidebar-active ${open ? "bg-beyen-console-sidebar-active" : ""
                     }`}
             >
                 {current}
@@ -44,7 +49,7 @@ export default function ProjectSwitcher() {
             </button>
 
             {open && (
-                <div className="absolute left-0 top-full z-50 mt-2 w-60 rounded-2xl border text-xs bg-beyen-console-menu p-2 text-beyen-console-foreground shadow-lg">
+                <div className="absolute left-0 top-full z-50 mt-2 w-60 rounded-2xl border bg-beyen-console-menu p-2 text-beyen-console-foreground shadow-lg">
                     <div className="px-3 py-2 uppercase tracking-wider text-muted-foreground text-xs">
                         Projects
                     </div>
@@ -52,7 +57,7 @@ export default function ProjectSwitcher() {
                         <button
                             key={name}
                             onClick={() => {
-                                setCurrent(name)
+                                onChange(name)
                                 setOpen(false)
                             }}
                             className={`${itemCls} ${current === name ? "font-medium" : ""

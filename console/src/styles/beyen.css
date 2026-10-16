@@ -8,7 +8,7 @@
     /* Beyen console usermenu trigger hover color */
     --color-beyen-console-sidebar-active: var(--beyen-console-sidebar-active);
     /* Beyen console sidebar nav item text foreground color */
-    --color-beyen-console-foreground: var(--beyen-console-sidebar-foreground);
+    --color-beyen-console-foreground: var(--beyen-console-foreground);
     /* Beyen console right main background color */
     /* Beyen console search background color */
     --color-beyen-console-surface: var(--beyen-console-surface);
@@ -24,7 +24,7 @@
     --beyen-console-sidebar: #f3f3f3;
     --beyen-console-sidebar-hover: #efefef;
     --beyen-console-sidebar-active: #ededed;
-    --beyen-console-sidebar-foreground: #282828;
+    --beyen-console-foreground: #282828;
     --beyen-console-surface: #ffffff;
     --beyen-console-menu: #ffffff;
     --beyen-console-menu-hover: #ececec;
@@ -35,7 +35,7 @@
     --beyen-console-sidebar: #131313;
     --beyen-console-sidebar-hover: #282828;
     --beyen-console-sidebar-active: #303030;
-    --beyen-console-sidebar-foreground: #dcdcdc;
+    --beyen-console-foreground: #dcdcdc;
     --beyen-console-surface: #212121;
     --beyen-console-menu: #303030;
     --beyen-console-menu-hover: #454545;

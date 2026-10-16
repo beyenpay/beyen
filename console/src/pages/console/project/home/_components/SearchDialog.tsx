@@ -46,6 +46,9 @@ const SEARCH_GROUPS = [
         items: [
             { label: "API Keys", icon: Key },
             { label: "Settings", icon: Settings },
+            { label: "Settings", icon: Settings },
+            { label: "Settings", icon: Settings },
+            { label: "Settings", icon: Settings },
         ],
     },
 ]
@@ -69,7 +72,7 @@ export default function SearchDialog({
             <Command className="rounded-3xl! bg-beyen-console-surface">
                 <CommandPrimitive.Input
                     placeholder="Search for anything..."
-                    className="h-14 w-full bg-transparent px-4 outline-none placeholder:text-neutral-400"
+                    className="h-14 w-full bg-transparent px-4 text-base outline-none placeholder:text-neutral-400"
                 />
                 <CommandList className="max-h-[60vh] pb-2">
                     <CommandEmpty>No results found.</CommandEmpty>
@@ -84,10 +87,10 @@ export default function SearchDialog({
                                     key={label}
                                     value={`${heading} ${label}`}
                                     onSelect={() => onOpenChange(false)}
-                                    className="cursor-pointer gap-3 rounded-lg px-3 py-2 text-sm hover:bg-beyen-console-search-hover text-muted-foreground"
+                                    className="cursor-pointer gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground data-selected:bg-beyen-console-search-hover"
                                 >
                                     <Icon className="size-4.5" />
-                                    <span className="">{label}</span>
+                                    <span>{label}</span>
                                     {arrow && (
                                         <CommandShortcut>
                                             <ArrowUpRight className="size-4" />
