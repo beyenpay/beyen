@@ -35,7 +35,7 @@ export default function ProjectSwitcher({
     }, [open])
 
     const itemCls =
-        "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-beyen-console-menu-hover"
+        "flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-left text-sm hover:bg-beyen-console-menu-hover"
 
     return (
         <div ref={ref} className="relative">
@@ -50,7 +50,7 @@ export default function ProjectSwitcher({
 
             {open && (
                 <div className="absolute left-0 top-full z-50 mt-2 w-60 rounded-2xl border bg-beyen-console-menu p-2 text-beyen-console-foreground shadow-lg">
-                    <div className="px-3 py-2 uppercase tracking-wider text-muted-foreground text-xs">
+                    <div className="px-3 py-1.5 uppercase tracking-wider text-muted-foreground text-[10px]">
                         Projects
                     </div>
                     {PROJECTS.map((name) => (
@@ -64,14 +64,13 @@ export default function ProjectSwitcher({
                                 }`}
                         >
                             <Check
-                                className={`size-3.5 shrink-0 ${current === name ? "" : "invisible"
-                                    }`}
+                                className={`size-3.5 shrink-0 ${current === name ? "" : "invisible" }`}
                             />
                             {name}
                         </button>
                     ))}
 
-                    <div className="my-2 border-t" />
+                    <div className="my-1 border-t" />
 
                     <button className={itemCls} onClick={() => setOpen(false)}>
                         <Plus className="size-4 shrink-0" />

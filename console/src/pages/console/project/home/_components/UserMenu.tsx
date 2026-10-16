@@ -40,9 +40,9 @@ export default function UserMenu({ collapsed }: { collapsed: boolean }) {
         <DropdownMenu>
             <DropdownMenuTrigger
                 aria-label="User menu"
-                className="flex h-13 w-full items-center gap-3 rounded-xl p-2 text-left outline-none transition-all duration-150 hover:bg-beyen-console-sidebar-active hover:shadow-md data-popup-open:bg-beyen-console-sidebar-active data-popup-open:shadow-md"
+                className="flex h-13 w-full items-center gap-2 rounded-xl p-2 pl-1.5 text-left outline-none transition-all duration-150 hover:bg-beyen-console-sidebar-active hover:shadow-md data-popup-open:bg-beyen-console-sidebar-active data-popup-open:shadow-md"
             >
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-sm text-background">
+                <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-foreground text-sm text-background">
                     T
                 </div>
                 {!collapsed && (
