@@ -18,6 +18,10 @@
     --color-beyen-console-menu-hover: var(--beyen-console-menu-hover);
     /* Beyen console search hover color */
     --color-beyen-console-search-hover: var(--beyen-console-search-hover);
+    /* Beyen console sidebar tag background color */
+    --color-beyen-console-sidebar-tag: var(--beyen-console-sidebar-tag);
+    /* Beyen console sidebar tag text color */
+    --color-beyen-console-sidebar-tag-foreground: var(--beyen-console-sidebar-tag-foreground);
 }
 
 :root {
@@ -29,6 +33,8 @@
     --beyen-console-menu: #ffffff;
     --beyen-console-menu-hover: #ececec;
     --beyen-console-search-hover: #ececec;
+    --beyen-console-sidebar-tag: #e6dbf5;
+    --beyen-console-sidebar-tag-foreground: #6c3bb4;
 }
 
 .dark {
@@ -40,4 +46,6 @@
     --beyen-console-menu: #303030;
     --beyen-console-menu-hover: #454545;
     --beyen-console-search-hover: #3c3c3c;
+    --beyen-console-sidebar-tag: #271c36;
+    --beyen-console-sidebar-tag-foreground: #be95fa;
 }

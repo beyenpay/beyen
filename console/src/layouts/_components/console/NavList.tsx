@@ -60,7 +60,7 @@ export default function NavList({
                                     <>
                                         <span className="flex-1">{label}</span>
                                         {s.tag && (
-                                            <span className="rounded-md bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
+                                            <span className="rounded-sm bg-beyen-console-sidebar-tag text-beyen-console-sidebar-tag-foreground px-2 py-0.5 text-xs font-medium ">
                                                 {t(s.tag)}
                                             </span>
                                         )}
