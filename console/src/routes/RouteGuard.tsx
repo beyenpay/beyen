@@ -1,8 +1,10 @@
 import type { ReactNode } from "react"
 import { Navigate, Outlet, useLocation, useParams, type Location } from "react-router"
-import type { Permission } from "@/constants/permissions"
+import { isSystemPermission, type Permission } from "@/constants/permissions"
+import { useCurrentProject } from "@/hooks/useCurrentProject"
 import { checkAccess } from "@/hooks/usePermission"
 import ForbiddenPage from "@/pages/error/ForbiddenPage"
+import NoProjectPage from "@/pages/error/NoProjectPage"
 import NotFoundPage from "@/pages/error/NotFoundPage"
 import ProjectDisabledPage from "@/pages/error/ProjectDisabledPage"
 import ServerErrorPage from "@/pages/error/ServerErrorPage"
@@ -30,6 +32,7 @@ export function RouteGuard({ guest, permission, children }: RouteGuardProps) {
     const { data: me, isError, refetch } = useMe()
     const location = useLocation()
     const params = useParams()
+    const { project: currentProject } = useCurrentProject()
 
     // data survives a failed background refetch, so only a first load that has
     // nothing to show gets here. A toast is no use: the page itself is blank.
@@ -51,8 +54,16 @@ export function RouteGuard({ guest, permission, children }: RouteGuardProps) {
         return content
     }
 
-    // The project comes from the URL, like the gateway's :project_id.
-    const projectId = params.projectId === undefined ? undefined : Number(params.projectId)
+    // Settings pages carry the project in the URL (like the gateway's :project_id);
+    // every other project page uses the current project from the store.
+    const paramId = params.projectId === undefined ? undefined : Number(params.projectId)
+    const projectId = paramId ?? currentProject?.id
+
+    // A project page with no project to show: a user without any project,
+    // including an admin who is not a member of any.
+    if (!isSystemPermission(permission) && projectId === undefined) {
+        return <NoProjectPage />
+    }
 
     switch (checkAccess(me, permission, projectId)) {
         case "granted":

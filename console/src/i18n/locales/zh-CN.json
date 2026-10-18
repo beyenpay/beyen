@@ -52,6 +52,10 @@
       "title": "页面不存在",
       "description": "你访问的页面不存在。"
     },
+    "noProject": {
+      "title": "还没有项目",
+      "description": "你尚未加入任何项目，请联系管理员。"
+    },
     "projectDisabled": {
       "title": "项目已被禁用",
       "description": "该项目已被平台管理员禁用。"
@@ -64,6 +68,55 @@
       "title": "出错了",
       "description": "页面加载失败。如果网站刚刚更新过，刷新页面通常可以解决。"
     }
+  },
+  "project": {
+    "none": "无项目",
+    "disabled": "已禁用"
+  },
+  "nav": {
+    "home": "首页",
+    "wallet": "钱包",
+    "transactions": "交易",
+    "customers": "客户",
+    "stats": "统计",
+    "developer": "开发者",
+    "apiKeys": "API Keys",
+    "webhooks": "Webhooks",
+    "projectSettings": "项目设置",
+    "general": "基础信息",
+    "brand": "品牌 / Logo",
+    "payment": "支付方式",
+    "members": "成员管理",
+    "dangerZone": "危险操作",
+    "systemConsole": "系统控制台",
+    "overview": "概览",
+    "projects": "项目管理",
+    "users": "系统用户",
+    "providers": "上游服务",
+    "providerRpc": "RPC 节点",
+    "providerTokenPrice": "加密货币价格",
+    "providerFiatRate": "法币汇率",
+    "health": "健康监控",
+    "healthUpstream": "上游服务状态",
+    "healthSystem": "系统服务状态",
+    "healthNodes": "分布式节点状态",
+    "healthBlockchain": "区块链状态",
+    "instance": "实例设置",
+    "instanceSmtp": "邮件服务",
+    "instanceAlert": "全局告警",
+    "instanceOthers": "其他设置",
+    "profile": "个人资料",
+    "password": "修改密码",
+    "sessions": "登录会话管理",
+    "notifications": "通知设置",
+    "appearance": "语言与外观",
+    "myProjects": "我参与的项目",
+    "backToProject": "返回项目"
+  },
+  "role": {
+    "admin": "系统管理员",
+    "manager": "项目管理员",
+    "developer": "开发者"
   },
   "landing": {
     "badge": "开源 · MIT 协议",

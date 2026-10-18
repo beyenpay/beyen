@@ -15,6 +15,15 @@ export type Access = "granted" | "forbidden" | "not_found" | "project_disabled"
 export function checkAccess(me: Me, permission: Permission, projectId?: number): Access {
     // An admin's system list also holds every project.* permission, valid in any project.
     if (me.permissions.system.includes(permission)) {
+        // An admin reaches every project, and the list holds all of them, so a
+        // project that is not in it does not exist.
+        if (
+            !isSystemPermission(permission) &&
+            projectId !== undefined &&
+            !me.permissions.projects.some((p) => p.id === projectId)
+        ) {
+            return "not_found"
+        }
         return "granted"
     }
     if (isSystemPermission(permission)) {

@@ -25,6 +25,7 @@ var (
 	ErrProjectNotFound = errors.New("project not found")
 	ErrUserNotFound    = errors.New("user not found")
 	ErrAlreadyMember   = errors.New("user is already a member of the project")
+	ErrAdminCannotJoin = errors.New("a platform admin cannot be a project member")
 )
 
 type Service struct {
@@ -79,6 +80,12 @@ func (s *Service) AddMember(ctx context.Context, projectID int, addr string, rol
 		return nil, ErrUserNotFound
 	case err != nil:
 		return nil, err
+	}
+
+	// An admin already holds every permission in every project, so a project
+	// role on top of it would only conflict with that.
+	if u.SystemRole == model.SystemRoleAdmin {
+		return nil, ErrAdminCannotJoin
 	}
 
 	m := &model.ProjectMember{ProjectID: projectID, UserID: u.ID, Role: role}

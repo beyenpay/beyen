@@ -8,6 +8,7 @@ import {
     CircleUserRound,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router"
 import { useTheme } from "@/providers/ThemeProvider"
 import { LANGUAGES } from "@/i18n/languages"
 import {
@@ -68,9 +69,12 @@ export default function UserMenu({ collapsed }: { collapsed: boolean }) {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className={itemCls}>
+                <DropdownMenuItem
+                    className={itemCls}
+                    render={<Link to="/console/account/profile" />}
+                >
                     <CircleUserRound />
-                    Profile settings
+                    Account settings
                 </DropdownMenuItem>
 
                 <DropdownMenuSub>

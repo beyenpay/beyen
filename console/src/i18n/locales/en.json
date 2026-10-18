@@ -52,6 +52,10 @@
       "title": "Page not found",
       "description": "The page you are looking for does not exist."
     },
+    "noProject": {
+      "title": "No project yet",
+      "description": "You have not joined any project. Please contact an administrator."
+    },
     "projectDisabled": {
       "title": "Project disabled",
       "description": "This project has been disabled by a platform administrator."
@@ -64,6 +68,55 @@
       "title": "Something went wrong",
       "description": "The page failed to load. If the site was just updated, reloading usually fixes it."
     }
+  },
+  "project": {
+    "none": "No project",
+    "disabled": "Disabled"
+  },
+  "nav": {
+    "home": "Home",
+    "wallet": "Wallet",
+    "transactions": "Transactions",
+    "customers": "Customers",
+    "stats": "Stats",
+    "developer": "Developer",
+    "apiKeys": "API Keys",
+    "webhooks": "Webhooks",
+    "projectSettings": "Project Settings",
+    "general": "General",
+    "brand": "Brand / Logo",
+    "payment": "Payment Method",
+    "members": "Members",
+    "dangerZone": "Danger Zone",
+    "systemConsole": "System Console",
+    "overview": "Overview",
+    "projects": "Projects",
+    "users": "Users",
+    "providers": "Upstream Providers",
+    "providerRpc": "RPC Nodes",
+    "providerTokenPrice": "Token Price",
+    "providerFiatRate": "Fiat Rate",
+    "health": "Health Monitoring",
+    "healthUpstream": "Upstream",
+    "healthSystem": "System",
+    "healthNodes": "Nodes",
+    "healthBlockchain": "Blockchain",
+    "instance": "Instance Settings",
+    "instanceSmtp": "SMTP",
+    "instanceAlert": "Alerts",
+    "instanceOthers": "Others",
+    "profile": "Profile",
+    "password": "Password",
+    "sessions": "Sessions",
+    "notifications": "Notifications",
+    "appearance": "Language & Appearance",
+    "myProjects": "My Projects",
+    "backToProject": "Back to project"
+  },
+  "role": {
+    "admin": "Admin",
+    "manager": "Manager",
+    "developer": "Developer"
   },
   "landing": {
     "badge": "Open source · MIT License",

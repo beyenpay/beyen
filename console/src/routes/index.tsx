@@ -1,10 +1,12 @@
 import { lazy, Suspense } from "react"
 import { createBrowserRouter, Outlet } from "react-router"
+import { consoleRoutes } from "./navRoutes"
 import { RouteGuard } from "./RouteGuard"
 // ==== components ====
 import { PageLoading } from "@/components/common/PageLoading"
 // ==== layouts ====
 import { AuthLayout } from "@/layouts/AuthLayout"
+import { ConsoleLayout } from "@/layouts/ConsoleLayout"
 import { LandingLayout } from "@/layouts/LandingLayout"
 // ==== pages ====
 import NotFoundPage from "@/pages/error/NotFoundPage"
@@ -12,7 +14,6 @@ import RouteErrorPage from "@/pages/error/RouteErrorPage"
 import LandingPage from "@/pages/landing/LandingPage"
 // ==== lazy pages ====
 const LoginPage = lazy(() => import("@/pages/auth/LoginPage"))
-const ProjectHomePage = lazy(() => import("@/pages/console/project/home/ProjectHomePage"))
 
 // A guard wraps the layout, never the other way round: when a guard blocks,
 // its error page brings its own header and footer, so it must replace the
@@ -51,7 +52,8 @@ export const router = createBrowserRouter([
             {
                 element: <RouteGuard />,
                 children: [
-                    { path: "/console", element: <ProjectHomePage /> }, // TEMP: ConsoleLayout + pages
+                    // Sidebar shell; every page below comes from config/nav.ts.
+                    { path: "/console", element: <ConsoleLayout />, children: consoleRoutes },
                 ],
             },
 

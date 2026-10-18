@@ -36,6 +36,6 @@ func buildHandler(cfg *config.Config, gdb *gorm.DB, rdb *redis.Client) http.Hand
 		User:    user.New(userRepo),
 		Auth:    auth.New(cfg.Session, userRepo, repository.NewSessionRepo(rdb, keys), limiter),
 		Authz:   authz.New(projectRepo, memberRepo, cache, keys),
-		Me:      me.New(userRepo, memberRepo, cache, keys),
+		Me:      me.New(userRepo, projectRepo, memberRepo, cache, keys),
 	})
 }

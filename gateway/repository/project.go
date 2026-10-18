@@ -32,3 +32,17 @@ func (r *ProjectRepo) Create(ctx context.Context, p *model.Project) error {
 	}
 	return nil
 }
+
+// ListAll returns every project except deleted ones, by id. It feeds the
+// project list of a platform admin, who reaches all projects.
+func (r *ProjectRepo) ListAll(ctx context.Context) ([]model.Project, error) {
+	var rows []model.Project
+	err := r.db.WithContext(ctx).
+		Where("status <> ?", model.ProjectStatusDeleted).
+		Order("id").
+		Find(&rows).Error
+	if err != nil {
+		return nil, fmt.Errorf("list projects: %w", err)
+	}
+	return rows, nil
+}

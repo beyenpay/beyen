@@ -35,3 +35,7 @@ func (k Keys) ProjectMember(projectID, userID int) string {
 
 // UserMe caches the data behind GET /me for one user: email and project memberships.
 func (k Keys) UserMe(userID int) string { return k.prefix + ":user:me:" + strconv.Itoa(userID) }
+
+// ProjectList caches every non-deleted project (id, name, status): the list a
+// platform admin sees in GET /me. One key shared by all admins.
+func (k Keys) ProjectList() string { return k.prefix + ":project:list" }

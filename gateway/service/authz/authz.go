@@ -72,10 +72,11 @@ func (s *Service) CheckProject(ctx context.Context, userID int, sysRole model.Sy
 	return nil
 }
 
-// InvalidateProject must be called after a project's name or status changes.
-// Every member's /me view shows the project, so their snapshots are dropped too.
+// InvalidateProject must be called after a project is created, renamed,
+// disabled or deleted. Every member's /me view shows the project, so their
+// snapshots are dropped too, and so is the project list that admins see.
 func (s *Service) InvalidateProject(ctx context.Context, projectID int) error {
-	keys := []string{s.keys.ProjectInfo(projectID)}
+	keys := []string{s.keys.ProjectInfo(projectID), s.keys.ProjectList()}
 	ids, listErr := s.members.ListUserIDs(ctx, projectID)
 	for _, id := range ids {
 		keys = append(keys, s.keys.UserMe(id))
