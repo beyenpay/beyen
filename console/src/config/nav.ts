@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { PERMISSIONS, type Permission } from "@/constants/permissions"
+import type { TemplateName } from "@/layouts/templates"
 
 // One page inside a section, shown as a tab (L3).
 export type NavTab = {
@@ -28,6 +29,8 @@ export type NavSection = {
     label: ParseKeys
     permission?: Permission
     tabs?: NavTab[]
+    // Which main-area template wraps it. Defaults to "section".
+    template?: TemplateName
     // Only the main sidebar has icons; the sub sidebars leave this out.
     icon?: LucideIcon
     // The lowest role that unlocks this entry, shown as a tag beside it.

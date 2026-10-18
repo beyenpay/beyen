@@ -4,7 +4,7 @@ import { Navigate, type RouteObject } from "react-router"
 
 import { PROJECT_NAV, SUB_NAVS, type NavSection } from "@/config/nav"
 import type { Permission } from "@/constants/permissions"
-import { SectionLayout } from "@/layouts/SectionLayout"
+import { TEMPLATES } from "@/layouts/templates"
 import PlaceholderPage from "@/pages/console/PlaceholderPage"
 import { ProjectParamSync } from "./ProjectParamSync"
 import { RouteGuard } from "./RouteGuard"
@@ -12,11 +12,13 @@ import { RouteGuard } from "./RouteGuard"
 // Real pages by full route path. Anything not listed shows a placeholder.
 const PAGES: Record<string, LazyExoticComponent<ComponentType>> = {
     "/console/home": lazy(() => import("@/pages/console/project/home/ProjectHomePage")),
+    "/console/customers": lazy(() => import("@/pages/console/project/customers/CustomersPage")),
+    "/console/developer/api-keys": lazy(() => import("@/pages/console/project/developer/ApiKeysPage")),
 }
 
-function page(path: string, label: ParseKeys, heading: boolean): ReactNode {
+function page(path: string, label: ParseKeys): ReactNode {
     const Page = PAGES[path]
-    return Page ? <Page /> : <PlaceholderPage label={label} heading={heading} />
+    return Page ? <Page /> : <PlaceholderPage label={label} />
 }
 
 function guarded(element: ReactNode, permission?: Permission): ReactNode {
@@ -26,20 +28,21 @@ function guarded(element: ReactNode, permission?: Permission): ReactNode {
 function sectionRoute(prefix: string, s: NavSection): RouteObject {
     const full = `${prefix}/${s.path}`
     const tabs = s.tabs
+    const Template = TEMPLATES[s.template ?? "section"]
 
-    const body: RouteObject = tabs
-        ? {
-              // The section's guard covers every tab; a tab may ask for more.
-              element: guarded(<SectionLayout section={s} />, s.permission),
-              children: [
-                  { index: true, element: <Navigate to={tabs[0].path} replace /> },
-                  ...tabs.map((tab) => ({
-                      path: tab.path,
-                      element: guarded(page(`${full}/${tab.path}`, tab.label, false), tab.permission),
-                  })),
-              ],
-          }
-        : { index: true, element: guarded(page(full, s.label, true), s.permission) }
+    const body: RouteObject = {
+        // The section's guard covers every tab; a tab may ask for more.
+        element: guarded(<Template section={s} />, s.permission),
+        children: tabs
+            ? [
+                { index: true, element: <Navigate to={tabs[0].path} replace /> },
+                ...tabs.map((tab) => ({
+                    path: tab.path,
+                    element: guarded(page(`${full}/${tab.path}`, tab.label), tab.permission),
+                })),
+            ]
+            : [{ index: true, element: page(full, s.label) }],
+    }
 
     return {
         path: s.path,
