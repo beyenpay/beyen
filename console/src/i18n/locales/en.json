@@ -116,7 +116,8 @@
   "role": {
     "admin": "Admin",
     "manager": "Manager",
-    "developer": "Developer"
+    "developer": "Developer",
+    "support": "Support"
   },
   "landing": {
     "badge": "Open source · MIT License",

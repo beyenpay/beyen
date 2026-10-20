@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { login } from "@/api/console/auth/auth"
+import { login, logout } from "@/api/console/auth/auth"
+import { useProjectStore } from "@/stores/project"
 
 import { meQueryKey } from "./me"
 
@@ -14,5 +15,19 @@ export function useLogin() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: meQueryKey }),
         // The login page shows its own error next to the form, not a toast.
         meta: { silent: true },
+    })
+}
+
+export function useLogout() {
+    return useMutation({
+        mutationFn: logout,
+        onSuccess: () => {
+            useProjectStore.getState().setCurrentProjectId(null)
+            // A full page load, not a client-side redirect: it drops every cached
+            // answer of this user at once, and the route guard cannot send the next
+            // login back to a page of the previous one.
+            window.location.assign("/login")
+        },
+        // A failure shows the global toast; the user is still signed in and can retry.
     })
 }

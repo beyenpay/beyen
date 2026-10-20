@@ -6,3 +6,8 @@ import type { UserInfo } from "@/types/me"
 export function login(values: LoginValues) {
     return api.post<{ user: UserInfo }>("/console/auth/login", values)
 }
+
+// Works with or without a valid session; the gateway clears the cookie either way.
+export function logout() {
+    return api.post<null>("/console/auth/logout")
+}

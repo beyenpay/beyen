@@ -58,6 +58,9 @@ export default function ProjectSwitcher() {
     const itemCls =
         "flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-left text-sm hover:bg-beyen-console-menu-hover"
 
+    const canCreate = can(PERMISSIONS.systemProjectWrite)
+    const canManage = can(PERMISSIONS.systemProjectRead)
+
     return (
         <div ref={ref} className="relative">
             <button
@@ -96,25 +99,29 @@ export default function ProjectSwitcher() {
                         </button>
                     ))}
 
-                    <div className="my-1 border-t" />
+                    {(canCreate || canManage) && (
+                        <>
+                            <div className="my-1 border-t" />
 
-                    {can(PERMISSIONS.systemProjectWrite) && (
-                        <button className={itemCls} onClick={() => setOpen(false)}>
-                            <Plus className="size-4 shrink-0" />
-                            Create project
-                        </button>
-                    )}
-                    {can(PERMISSIONS.systemProjectRead) && (
-                        <button
-                            className={itemCls}
-                            onClick={() => {
-                                navigate("/console/system/projects")
-                                setOpen(false)
-                            }}
-                        >
-                            <Settings className="size-4 shrink-0" />
-                            Manage projects
-                        </button>
+                            {canCreate && (
+                                <button className={itemCls} onClick={() => setOpen(false)}>
+                                    <Plus className="size-4 shrink-0" />
+                                    Create project
+                                </button>
+                            )}
+                            {canManage && (
+                                <button
+                                    className={itemCls}
+                                    onClick={() => {
+                                        navigate("/console/system/projects")
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <Settings className="size-4 shrink-0" />
+                                    Manage projects
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             )}

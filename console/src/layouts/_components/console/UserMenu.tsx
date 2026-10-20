@@ -1,6 +1,5 @@
 
 import {
-    Code,
     Languages,
     LogOut,
     Palette,
@@ -23,6 +22,11 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { FaGithub } from "react-icons/fa"
+import type { ParseKeys } from "i18next"
+import { useCurrentProject } from "@/hooks/useCurrentProject"
+import { useLogout } from "@/queries/console/auth/auth"
+import { useMe } from "@/queries/console/auth/me"
 
 const THEME_OPTIONS = [
     { value: "light", label: "Light" },
@@ -33,9 +37,27 @@ const itemCls = "gap-3 rounded-lg px-3 py-2 text-sm focus:bg-beyen-console-menu-
 const subTriggerCls = `${itemCls} data-open:bg-beyen-console-menu-hover data-popup-open:bg-beyen-console-menu-hover`
 const subItemCls = "rounded-lg px-3 py-2 text-sm focus:bg-beyen-console-menu-hover"
 
+const ROLE_KEYS: Record<string, ParseKeys> = {
+    admin: "role.admin",
+    manager: "role.manager",
+    developer: "role.developer",
+    support: "role.support",
+}
+
+// An admin is an admin everywhere; anyone else shows their role in the current
+// project, and nothing when they have no project.
+function useAccount() {
+    const { data: me } = useMe()
+    const { project } = useCurrentProject()
+    const role = me?.user.system_role || project?.role
+    return { email: me?.user.email ?? "", roleKey: role ? ROLE_KEYS[role] : undefined }
+}
+
 export default function UserMenu({ collapsed }: { collapsed: boolean }) {
     const { theme, setTheme } = useTheme()
-    const { i18n } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const { email, roleKey } = useAccount()
+    const logout = useLogout()
 
     return (
         <DropdownMenu>
@@ -44,12 +66,12 @@ export default function UserMenu({ collapsed }: { collapsed: boolean }) {
                 className="flex h-13 w-full items-center gap-2 rounded-xl p-2 pl-1.5 text-left outline-none transition-all duration-150 hover:bg-beyen-console-sidebar-active hover:shadow-md data-popup-open:bg-beyen-console-sidebar-active data-popup-open:shadow-md"
             >
                 <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-foreground text-sm text-background">
-                    T
+                    {email.charAt(0).toUpperCase()}
                 </div>
                 {!collapsed && (
-                    <div className="leading-tight">
-                        <div className="text-sm font-medium">support@beyen.com</div>
-                        <div className="text-xs opacity-60">admin</div>
+                    <div className="min-w-0 leading-tight">
+                        <div className="truncate text-sm font-medium">{email}</div>
+                        {roleKey && <div className="text-xs opacity-60">{t(roleKey)}</div>}
                     </div>
                 )}
             </DropdownMenuTrigger>
@@ -61,10 +83,10 @@ export default function UserMenu({ collapsed }: { collapsed: boolean }) {
                 className="w-64 rounded-2xl p-1 bg-beyen-console-menu"
             >
                 <div className="px-3 py-2 leading-tight">
-                    <div className="text-sm text-muted-foreground">support@beyen.com</div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                        admin
-                    </div>
+                    <div className="truncate text-sm text-muted-foreground">{email}</div>
+                    {roleKey && (
+                        <div className="mt-1 text-xs text-muted-foreground">{t(roleKey)}</div>
+                    )}
                 </div>
 
                 <DropdownMenuSeparator />
@@ -137,18 +159,18 @@ export default function UserMenu({ collapsed }: { collapsed: boolean }) {
                     className={itemCls}
                     render={
                         <a
-                            href="https://github.com"
+                            href="https://github.com/beyenpay/beyen"
                             target="_blank"
                             rel="noreferrer"
                         />
                     }
                 >
-                    <Code />
+                    <FaGithub />
                     Github
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     className={itemCls}
-                    render={<a href="#" target="_blank" rel="noreferrer" />}
+                    render={<a href="/" target="_blank" rel="noreferrer" />}
                 >
                     <Users />
                     Community
@@ -156,7 +178,11 @@ export default function UserMenu({ collapsed }: { collapsed: boolean }) {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className={itemCls}>
+                <DropdownMenuItem
+                    className={itemCls}
+                    disabled={logout.isPending}
+                    onClick={() => logout.mutate()}
+                >
                     <LogOut />
                     Log out
                 </DropdownMenuItem>

@@ -116,7 +116,8 @@
   "role": {
     "admin": "系统管理员",
     "manager": "项目管理员",
-    "developer": "开发者"
+    "developer": "开发者",
+    "support": "客服"
   },
   "landing": {
     "badge": "开源 · MIT 协议",
