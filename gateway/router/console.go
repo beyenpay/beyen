@@ -23,6 +23,7 @@ func mountConsole(api *gin.RouterGroup, d Deps) {
 	authH := consolehandler.NewAuthHandler(d.Auth, cookie)
 	meH := consolehandler.NewMeHandler(d.Me)
 	sessH := consolehandler.NewSessionHandler(d.Auth, cookie)
+	setupH := consolehandler.NewSetupHandler(d.User)
 
 	console := api.Group("/console",
 		middleware.CSRF(d.Config.App.PublicURL),
@@ -34,6 +35,15 @@ func mountConsole(api *gin.RouterGroup, d Deps) {
 		middleware.RequireAnonymous(), // before the limiter, so a repeated click does not spend the IP budget
 		middleware.RateLimit(d.Limiter, "login", ratelimit.Rule{Max: 30, Window: 15 * time.Minute}, middleware.ByIP),
 		authH.Login,
+	)
+	// First-run setup: public on purpose. Both only work while no user exists.
+	console.GET("/setup/status",
+		middleware.RateLimit(d.Limiter, "setup-status", ratelimit.Rule{Max: 60, Window: time.Minute}, middleware.ByIP),
+		setupH.Status,
+	)
+	console.POST("/setup",
+		middleware.RateLimit(d.Limiter, "setup", ratelimit.Rule{Max: 10, Window: 15 * time.Minute}, middleware.ByIP),
+		setupH.Setup,
 	)
 	// Logout works with or without a valid session, so a stale cookie can always be cleared.
 	console.POST("/auth/logout", authH.Logout)

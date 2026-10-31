@@ -38,4 +38,6 @@ var (
 	ErrAccountDisabled    = Error{http.StatusForbidden, CodeAccountDisabled, "account is disabled"}
 	ErrTooManyAttempts    = Error{http.StatusTooManyRequests, CodeTooManyAttempts, "too many attempts, try again later"}
 	ErrProjectDisabled    = Error{http.StatusForbidden, CodeProjectDisabled, "project is disabled"}
+	ErrSetupCompleted     = Error{http.StatusConflict, CodeSetupCompleted, "setup already completed"}
+	ErrWeakPassword       = Error{http.StatusBadRequest, CodeWeakPassword, "password does not meet the policy"}
 )

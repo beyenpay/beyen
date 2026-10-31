@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react"
 import { createBrowserRouter, Outlet } from "react-router"
 import { consoleRoutes } from "./navRoutes"
 import { RouteGuard } from "./RouteGuard"
+import { SetupGate } from "./SetupGate"
 // ==== components ====
 import { PageLoading } from "@/components/common/PageLoading"
 // ==== layouts ====
@@ -14,6 +15,7 @@ import RouteErrorPage from "@/pages/error/RouteErrorPage"
 import LandingPage from "@/pages/landing/LandingPage"
 // ==== lazy pages ====
 const LoginPage = lazy(() => import("@/pages/auth/LoginPage"))
+const SetupPage = lazy(() => import("@/pages/auth/SetupPage"))
 
 // A guard wraps the layout, never the other way round: when a guard blocks,
 // its error page brings its own header and footer, so it must replace the
@@ -43,7 +45,11 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         element: <AuthLayout />,
-                        children: [{ path: "/login", element: <LoginPage /> }],
+                        children: [
+                            // No user yet: /login hands over to /setup, and the other way round.
+                            { element: <SetupGate />, children: [{ path: "/login", element: <LoginPage /> }] },
+                            { element: <SetupGate required />, children: [{ path: "/setup", element: <SetupPage /> }] },
+                        ],
                     },
                 ],
             },

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/beyenpay/beyen/gateway/model"
 	"github.com/beyenpay/beyen/gateway/pkg/email"
@@ -15,15 +16,17 @@ import (
 )
 
 var (
-	ErrInvalidEmail = errors.New("invalid email address")
-	ErrEmailTaken   = errors.New("email is already registered")
-	ErrInvalidRole  = errors.New("invalid system role")
-	ErrWeakPassword = errors.New("weak password") // wrapped with the reason
-	ErrNotFound     = errors.New("user not found")
+	ErrInvalidEmail   = errors.New("invalid email address")
+	ErrEmailTaken     = errors.New("email is already registered")
+	ErrInvalidRole    = errors.New("invalid system role")
+	ErrWeakPassword   = errors.New("weak password") // wrapped with the reason
+	ErrNotFound       = errors.New("user not found")
+	ErrSetupCompleted = errors.New("setup already completed")
 )
 
 type Service struct {
-	users *repository.UserRepo
+	users   *repository.UserRepo
+	setupMu sync.Mutex // serializes first-admin creation within this process
 }
 
 func New(users *repository.UserRepo) *Service { return &Service{users: users} }
@@ -75,6 +78,34 @@ func (s *Service) Get(ctx context.Context, id int) (*model.User, error) {
 		return nil, ErrNotFound
 	}
 	return u, err
+}
+
+// NeedsSetup reports whether no user exists yet, i.e. the first admin is still to be created.
+func (s *Service) NeedsSetup(ctx context.Context) (bool, error) {
+	n, err := s.users.Count(ctx)
+	if err != nil {
+		return false, err
+	}
+	return n == 0, nil
+}
+
+// CreateFirstAdmin creates the platform admin of a fresh system. It returns
+// ErrSetupCompleted once any user exists. The lock only covers this process;
+// that is enough for a single gateway, and a second instance racing the very
+// first request would still be stopped by the unique email index for the same
+// address.
+func (s *Service) CreateFirstAdmin(ctx context.Context, addr, plain string) (*model.User, error) {
+	s.setupMu.Lock()
+	defer s.setupMu.Unlock()
+
+	need, err := s.NeedsSetup(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !need {
+		return nil, ErrSetupCompleted
+	}
+	return s.Create(ctx, CreateInput{Email: addr, Password: plain, SystemRole: model.SystemRoleAdmin})
 }
 
 // validatePassword applies the password policy plus one rule that needs the

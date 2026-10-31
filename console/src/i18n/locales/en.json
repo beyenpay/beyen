@@ -19,7 +19,9 @@
       "INVALID_CREDENTIALS": "Invalid email or password.",
       "ACCOUNT_DISABLED": "This account is disabled.",
       "TOO_MANY_ATTEMPTS": "Too many attempts. Please try again later.",
-      "PROJECT_DISABLED": "This project is disabled."
+      "PROJECT_DISABLED": "This project is disabled.",
+      "SETUP_COMPLETED": "The system has already been set up.",
+      "WEAK_PASSWORD": "Password does not meet the policy: 8–128 characters with a letter and a digit, and it must not contain the email name."
     }
   },
   "site": {
@@ -34,10 +36,24 @@
     "password": "Password",
     "submit": "Sign in"
   },
+  "setup": {
+    "title": "Set up Beyen",
+    "description": "Create the first administrator account. You can sign in right after.",
+    "email": "Email",
+    "emailPlaceholder": "admin@example.com",
+    "password": "Password",
+    "passwordHint": "8–128 characters with at least one letter and one digit.",
+    "confirmPassword": "Confirm password",
+    "submit": "Create administrator"
+  },
   "validation": {
     "emailInvalid": "Enter a valid email address.",
     "passwordRequired": "Enter your password.",
-    "passwordTooLong": "Password is too long."
+    "passwordTooLong": "Password is too long.",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "passwordWeak": "Password must contain a letter and a digit.",
+    "confirmPasswordRequired": "Confirm your password.",
+    "passwordMismatch": "The two passwords do not match."
   },
   "errorPage": {
     "backToConsole": "Back to console",

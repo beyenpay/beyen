@@ -19,7 +19,9 @@
       "INVALID_CREDENTIALS": "邮箱或密码错误。",
       "ACCOUNT_DISABLED": "该账号已被禁用。",
       "TOO_MANY_ATTEMPTS": "尝试次数过多，请稍后再试。",
-      "PROJECT_DISABLED": "该项目已被禁用。"
+      "PROJECT_DISABLED": "该项目已被禁用。",
+      "SETUP_COMPLETED": "系统已完成初始化。",
+      "WEAK_PASSWORD": "密码不符合要求：8–128 位，包含字母和数字，且不能包含邮箱名称。"
     }
   },
   "site": {
@@ -34,10 +36,24 @@
     "password": "密码",
     "submit": "登录"
   },
+  "setup": {
+    "title": "初始化系统",
+    "description": "创建第一个管理员账号，完成后即可登录控制台。",
+    "email": "邮箱",
+    "emailPlaceholder": "admin@example.com",
+    "password": "密码",
+    "passwordHint": "8–128 位，至少包含一个字母和一个数字。",
+    "confirmPassword": "确认密码",
+    "submit": "创建管理员"
+  },
   "validation": {
     "emailInvalid": "请输入有效的邮箱地址。",
     "passwordRequired": "请输入密码。",
-    "passwordTooLong": "密码过长。"
+    "passwordTooLong": "密码过长。",
+    "passwordTooShort": "密码至少 8 位。",
+    "passwordWeak": "密码需同时包含字母和数字。",
+    "confirmPasswordRequired": "请再次输入密码。",
+    "passwordMismatch": "两次输入的密码不一致。"
   },
   "errorPage": {
     "backToConsole": "返回控制台",
@@ -117,7 +133,7 @@
     "admin": "系统管理员",
     "manager": "项目管理员",
     "developer": "开发者",
-    "support": "客服"
+    "support": "支持"
   },
   "landing": {
     "badge": "开源 · MIT 协议",

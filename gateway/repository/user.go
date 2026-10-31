@@ -38,6 +38,15 @@ func (r *UserRepo) Create(ctx context.Context, u *model.User) error {
 	return nil
 }
 
+// Count returns how many users exist, whatever their status.
+func (r *UserRepo) Count(ctx context.Context) (int64, error) {
+	var n int64
+	if err := r.db.WithContext(ctx).Model(&model.User{}).Count(&n).Error; err != nil {
+		return 0, fmt.Errorf("count users: %w", err)
+	}
+	return n, nil
+}
+
 // GetByEmail expects an email already normalized to lower case.
 func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	var u model.User

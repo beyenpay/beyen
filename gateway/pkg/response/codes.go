@@ -25,4 +25,6 @@ const (
 	CodeAccountDisabled    = "ACCOUNT_DISABLED"
 	CodeTooManyAttempts    = "TOO_MANY_ATTEMPTS" // login attempts throttled
 	CodeProjectDisabled    = "PROJECT_DISABLED"  // the project is frozen by a platform admin
+	CodeSetupCompleted     = "SETUP_COMPLETED"   // first-run setup attempted while users already exist
+	CodeWeakPassword       = "WEAK_PASSWORD"     // new password breaks the password policy
 )
