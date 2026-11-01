@@ -88,9 +88,10 @@ const (
 // ListInput is a page request plus optional filters; zero means "no condition".
 type ListInput struct {
 	Page, PageSize int
-	Email          string // substring
+	Email          string // substring, or the whole address when EmailExact
+	EmailExact     bool
 	Status         model.UserStatus
-	Role           string // "admin", "user" or ""
+	Roles          []string // any of "admin", "user"; empty means any
 	CreatedFrom    int64
 	CreatedTo      int64
 }
@@ -113,8 +114,9 @@ func (s *Service) List(ctx context.Context, in ListInput) (*ListResult, error) {
 
 	users, total, err := s.users.List(ctx, repository.UserFilter{
 		Email:       email.Normalize(in.Email),
+		EmailExact:  in.EmailExact,
 		Status:      in.Status,
-		Role:        in.Role,
+		Roles:       in.Roles,
 		CreatedFrom: in.CreatedFrom,
 		CreatedTo:   in.CreatedTo,
 	}, (in.Page-1)*in.PageSize, in.PageSize)

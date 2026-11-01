@@ -43,6 +43,7 @@ export default function UsersPage() {
       key: "q",
       label: t("users.email"),
       placeholder: t("users.searchPlaceholder"),
+      ops: ["contains"],
     },
     {
       type: "select",
@@ -55,7 +56,7 @@ export default function UsersPage() {
       ],
     },
     {
-      type: "select",
+      type: "multiSelect",
       key: "role",
       label: t("users.role"),
       options: [
@@ -63,7 +64,7 @@ export default function UsersPage() {
         { value: "user", label: t("users.roles.user") },
       ],
     },
-    { type: "dateRange", key: "created", label: t("users.created") },
+    { type: "dateTime", key: "created", label: t("users.created") },
   ]
 
   const presets: Preset[] = [

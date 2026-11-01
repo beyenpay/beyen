@@ -50,9 +50,10 @@ func (r *UserRepo) Count(ctx context.Context) (int64, error) {
 
 // UserFilter narrows a user listing. Zero values mean "no condition".
 type UserFilter struct {
-	Email       string           // substring, already normalized to lower case
+	Email       string           // already normalized to lower case
+	EmailExact  bool             // true: equals Email, false: contains it
 	Status      model.UserStatus // 0 = any
-	Role        string           // "admin", "user" (no system role) or "" = any
+	Roles       []string         // any of "admin", "user" (no system role); empty = any
 	CreatedFrom int64            // unix seconds, inclusive
 	CreatedTo   int64            // unix seconds, inclusive
 }
@@ -62,15 +63,29 @@ var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
 
 func (f UserFilter) apply(db *gorm.DB) *gorm.DB {
 	if f.Email != "" {
-		db = db.Where("email LIKE ?", "%"+likeEscaper.Replace(f.Email)+"%")
+		if f.EmailExact {
+			db = db.Where("email = ?", f.Email)
+		} else {
+			db = db.Where("email LIKE ?", "%"+likeEscaper.Replace(f.Email)+"%")
+		}
 	}
 	if f.Status != 0 {
 		db = db.Where("status = ?", f.Status)
 	}
-	switch f.Role {
-	case "admin":
+	// Both roles, or none, is no condition at all.
+	var wantAdmin, wantUser bool
+	for _, r := range f.Roles {
+		switch r {
+		case "admin":
+			wantAdmin = true
+		case "user":
+			wantUser = true
+		}
+	}
+	switch {
+	case wantAdmin && !wantUser:
 		db = db.Where("system_role = ?", model.SystemRoleAdmin)
-	case "user":
+	case wantUser && !wantAdmin:
 		db = db.Where("system_role = ?", "")
 	}
 	if f.CreatedFrom > 0 {

@@ -30,12 +30,19 @@ func (h *UserHandler) List(c *gin.Context) {
 		return
 	}
 
+	roles, ok := req.RoleList()
+	if !ok || (req.CreatedFrom > 0 && req.CreatedTo > 0 && req.CreatedFrom > req.CreatedTo) {
+		response.Fail(c, response.ErrInvalidParams)
+		return
+	}
+
 	res, err := h.svc.List(c.Request.Context(), user.ListInput{
 		Page:        req.Page,
 		PageSize:    req.PageSize,
 		Email:       req.Q,
+		EmailExact:  req.QOp == "eq",
 		Status:      model.UserStatus(req.Status),
-		Role:        req.Role,
+		Roles:       roles,
 		CreatedFrom: req.CreatedFrom,
 		CreatedTo:   req.CreatedTo,
 	})

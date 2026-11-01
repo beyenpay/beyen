@@ -1,6 +1,10 @@
 package console
 
-import "github.com/beyenpay/beyen/gateway/model"
+import (
+	"strings"
+
+	"github.com/beyenpay/beyen/gateway/model"
+)
 
 // CreateUserRequest is the body of POST /system/users. SystemRole is empty for
 // a normal user; admin is the only role that can be granted.
@@ -16,10 +20,27 @@ type ListUsersRequest struct {
 	Page        int    `form:"page" binding:"omitempty,min=1,max=100000"`
 	PageSize    int    `form:"page_size" binding:"omitempty,min=1,max=100"`
 	Q           string `form:"q" binding:"omitempty,max=255"`
+	QOp         string `form:"q_op" binding:"omitempty,oneof=eq contains"` // empty means contains
 	Status      int    `form:"status" binding:"omitempty,oneof=1 2 3"`
-	Role        string `form:"role" binding:"omitempty,oneof=admin user"`
+	Role        string `form:"role" binding:"omitempty,max=64"` // comma separated: admin,user
 	CreatedFrom int64  `form:"created_from" binding:"omitempty,min=0"`
 	CreatedTo   int64  `form:"created_to" binding:"omitempty,min=0"`
+}
+
+// RoleList splits the role parameter. ok is false when any part is not a known role.
+func (r ListUsersRequest) RoleList() (roles []string, ok bool) {
+	if r.Role == "" {
+		return nil, true
+	}
+	for part := range strings.SplitSeq(r.Role, ",") {
+		switch part {
+		case "admin", "user":
+			roles = append(roles, part)
+		default:
+			return nil, false
+		}
+	}
+	return roles, true
 }
 
 // UserListItem is one row of the users table.

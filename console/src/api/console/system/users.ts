@@ -6,18 +6,13 @@ import type { UserRow } from "@/types/user"
 export type ListUsersParams = {
     page: number
     pageSize: number
-    // The table's URL filters: q, status, role, created_from, created_to (dates as YYYY-MM-DD).
+    // The table's URL filters: q, q_op (eq | contains), status, role (a,b),
+    // created_from and created_to (unix seconds, inclusive).
     filters: Record<string, string>
 }
 
-// A local calendar day as unix seconds; undefined for anything that is not a date.
-function dayToUnix(day: string | undefined, endOfDay: boolean) {
-    if (!day) {
-        return undefined
-    }
-    const start = new Date(`${day}T00:00:00`).getTime() / 1000
-    return Number.isNaN(start) ? undefined : start + (endOfDay ? 86399 : 0)
-}
+// Digits only; anything else in a hand-edited URL is dropped instead of sent.
+const unix = (v: string | undefined) => (v && /^\d+$/.test(v) ? v : undefined)
 
 export function listUsers({ page, pageSize, filters }: ListUsersParams, signal?: AbortSignal) {
     return api.get<Page<UserRow>>("/console/system/users", {
@@ -26,10 +21,11 @@ export function listUsers({ page, pageSize, filters }: ListUsersParams, signal?:
             page,
             page_size: pageSize,
             q: filters.q,
+            q_op: filters.q_op,
             status: filters.status,
             role: filters.role,
-            created_from: dayToUnix(filters.created_from, false),
-            created_to: dayToUnix(filters.created_to, true),
+            created_from: unix(filters.created_from),
+            created_to: unix(filters.created_to),
         },
     })
 }

@@ -41,18 +41,36 @@ export type BulkAction<T> = {
 
 export type FilterOption = { value: string; label: string }
 
+export type TextOp = "eq" | "contains"
+
 export type FilterDef =
-    | { type: "text"; key: string; label: string; placeholder?: string }
+    // The first of `ops` is the default (default ["eq"]). One op is shown as
+    // plain text, several as a menu. URL: `${key}` and `${key}_op`.
+    | { type: "text"; key: string; label: string; placeholder?: string; ops?: TextOp[] }
+    // One value out of `options`. URL: `${key}`.
     | { type: "select"; key: string; label: string; options: FilterOption[] }
-    // Uses two URL parameters, `${key}_from` and `${key}_to`, as YYYY-MM-DD.
-    | { type: "dateRange"; key: string; label: string }
+    // Several values out of `options`. URL: `${key}` as `a,b`.
+    | { type: "multiSelect"; key: string; label: string; options: FilterOption[] }
+    // Always "between", read in the browser's time zone. URL: `${key}_from`
+    // and `${key}_to` as unix seconds; the end is inclusive.
+    | { type: "dateTime"; key: string; label: string }
 
 // A chip on the left of the toolbar: a named set of filters.
 export type Preset = { id: string; label: string; filters: Record<string, string> }
 
+// The URL parameters one filter owns.
+export function defKeys(d: FilterDef) {
+    switch (d.type) {
+        case "text":
+            return [d.key, `${d.key}_op`]
+        case "dateTime":
+            return [`${d.key}_from`, `${d.key}_to`]
+        default:
+            return [d.key]
+    }
+}
+
 // The URL parameters behind a list of filters, for useTableParams.
 export function filterKeys(defs: FilterDef[]) {
-    return defs.flatMap((d) =>
-        d.type === "dateRange" ? [`${d.key}_from`, `${d.key}_to`] : [d.key],
-    )
+    return defs.flatMap(defKeys)
 }
