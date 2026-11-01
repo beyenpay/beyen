@@ -80,6 +80,50 @@ func (s *Service) Get(ctx context.Context, id int) (*model.User, error) {
 	return u, err
 }
 
+const (
+	defaultPageSize = 20
+	maxPageSize     = 100
+)
+
+// ListInput is a page request plus optional filters; zero means "no condition".
+type ListInput struct {
+	Page, PageSize int
+	Email          string // substring
+	Status         model.UserStatus
+	Role           string // "admin", "user" or ""
+	CreatedFrom    int64
+	CreatedTo      int64
+}
+
+type ListResult struct {
+	Users          []model.User
+	Total          int64
+	Page, PageSize int // after clamping, as actually applied
+}
+
+// List returns one page of users, newest first.
+func (s *Service) List(ctx context.Context, in ListInput) (*ListResult, error) {
+	if in.Page < 1 {
+		in.Page = 1
+	}
+	if in.PageSize < 1 {
+		in.PageSize = defaultPageSize
+	}
+	in.PageSize = min(in.PageSize, maxPageSize)
+
+	users, total, err := s.users.List(ctx, repository.UserFilter{
+		Email:       email.Normalize(in.Email),
+		Status:      in.Status,
+		Role:        in.Role,
+		CreatedFrom: in.CreatedFrom,
+		CreatedTo:   in.CreatedTo,
+	}, (in.Page-1)*in.PageSize, in.PageSize)
+	if err != nil {
+		return nil, err
+	}
+	return &ListResult{Users: users, Total: total, Page: in.Page, PageSize: in.PageSize}, nil
+}
+
 // NeedsSetup reports whether no user exists yet, i.e. the first admin is still to be created.
 func (s *Service) NeedsSetup(ctx context.Context) (bool, error) {
 	n, err := s.users.Count(ctx)

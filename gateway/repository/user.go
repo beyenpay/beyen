@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 
@@ -45,6 +46,59 @@ func (r *UserRepo) Count(ctx context.Context) (int64, error) {
 		return 0, fmt.Errorf("count users: %w", err)
 	}
 	return n, nil
+}
+
+// UserFilter narrows a user listing. Zero values mean "no condition".
+type UserFilter struct {
+	Email       string           // substring, already normalized to lower case
+	Status      model.UserStatus // 0 = any
+	Role        string           // "admin", "user" (no system role) or "" = any
+	CreatedFrom int64            // unix seconds, inclusive
+	CreatedTo   int64            // unix seconds, inclusive
+}
+
+// likeEscaper makes user input literal inside a LIKE pattern.
+var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+
+func (f UserFilter) apply(db *gorm.DB) *gorm.DB {
+	if f.Email != "" {
+		db = db.Where("email LIKE ?", "%"+likeEscaper.Replace(f.Email)+"%")
+	}
+	if f.Status != 0 {
+		db = db.Where("status = ?", f.Status)
+	}
+	switch f.Role {
+	case "admin":
+		db = db.Where("system_role = ?", model.SystemRoleAdmin)
+	case "user":
+		db = db.Where("system_role = ?", "")
+	}
+	if f.CreatedFrom > 0 {
+		db = db.Where("created_at >= ?", f.CreatedFrom)
+	}
+	if f.CreatedTo > 0 {
+		db = db.Where("created_at <= ?", f.CreatedTo)
+	}
+	return db
+}
+
+// List returns one page of users, newest first, and how many users match in total.
+func (r *UserRepo) List(ctx context.Context, f UserFilter, offset, limit int) ([]model.User, int64, error) {
+	// A *gorm.DB must not be reused after a finisher, so each query builds its own.
+	query := func() *gorm.DB { return f.apply(r.db.WithContext(ctx).Model(&model.User{})) }
+
+	var total int64
+	if err := query().Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("count users: %w", err)
+	}
+	users := []model.User{}
+	if total == 0 {
+		return users, 0, nil
+	}
+	if err := query().Order("id DESC").Offset(offset).Limit(limit).Find(&users).Error; err != nil {
+		return nil, 0, fmt.Errorf("list users: %w", err)
+	}
+	return users, total, nil
 }
 
 // GetByEmail expects an email already normalized to lower case.

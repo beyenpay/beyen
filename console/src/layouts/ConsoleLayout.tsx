@@ -61,7 +61,7 @@ export function ConsoleLayout() {
 
     return (
         <div className="flex h-dvh bg-beyen-console-surface overflow-hidden overscroll-none">
-            <TooltipProvider delay={400}>
+            <TooltipProvider delay={100}>
                 <aside
                     onTransitionEnd={(e) => {
                         if (e.target === e.currentTarget && e.propertyName === "width" && !collapsed)

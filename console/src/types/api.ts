@@ -5,3 +5,11 @@ export type ApiBody = {
     message: string
     data?: unknown
 }
+
+// Mirrors gateway dto/console Page[T].
+export type Page<T> = {
+    items: T[]
+    total: number
+    page: number
+    page_size: number
+}

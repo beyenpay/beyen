@@ -18,10 +18,36 @@
     --color-beyen-console-menu-hover: var(--beyen-console-menu-hover);
     /* Beyen console search hover color */
     --color-beyen-console-search-hover: var(--beyen-console-search-hover);
-    /* Beyen console sidebar tag background color */
-    --color-beyen-console-sidebar-tag: var(--beyen-console-sidebar-tag);
-    /* Beyen console sidebar tag text color */
-    --color-beyen-console-sidebar-tag-foreground: var(--beyen-console-sidebar-tag-foreground);
+    /* ---- gray ---- */
+    /* Beyen oai badge gray for background color */
+    --color-beyen-oai-badge-gray: var(--beyen-oai-badge-gray);
+    /* Beyen oai badge gray for text color */
+    --color-beyen-oai-badge-gray-foreground: var(--beyen-oai-badge-gray-foreground);
+    /* ---- green ---- */
+    /* Beyen oai badge green for background color */
+    --color-beyen-oai-badge-green: var(--beyen-oai-badge-green);
+    /* Beyen oai badge green for text color */
+    --color-beyen-oai-badge-green-foreground: var(--beyen-oai-badge-green-foreground);
+    /* ---- blue ---- */
+    /* Beyen oai badge blue for background color */
+    --color-beyen-oai-badge-blue: var(--beyen-oai-badge-blue);
+    /* Beyen oai badge blue for text color */
+    --color-beyen-oai-badge-blue-foreground: var(--beyen-oai-badge-blue-foreground);
+    /* ---- red ---- */
+    /* Beyen oai badge red for background color */
+    --color-beyen-oai-badge-red: var(--beyen-oai-badge-red);
+    /* Beyen oai badge red for text color */
+    --color-beyen-oai-badge-red-foreground: var(--beyen-oai-badge-red-foreground);
+    /* ---- purple ---- */
+    /* Beyen oai badge purple for background color */
+    --color-beyen-oai-badge-purple: var(--beyen-oai-badge-purple);
+    /* Beyen oai badge purple for text color */
+    --color-beyen-oai-badge-purple-foreground: var(--beyen-oai-badge-purple-foreground);
+    /* ---- */
+    /* Beyen console table header */
+    --color-beyen-console-table-header: var(--beyen-console-table-header);
+    /* Beyen console table hover */
+    --color-beyen-console-table-hover: var(--beyen-console-table-hover);
 }
 
 :root {
@@ -33,8 +59,18 @@
     --beyen-console-menu: #ffffff;
     --beyen-console-menu-hover: #ececec;
     --beyen-console-search-hover: #ececec;
-    --beyen-console-sidebar-tag: #e6dbf5;
-    --beyen-console-sidebar-tag-foreground: #6c3bb4;
+    --beyen-oai-badge-gray: #ececec;
+    --beyen-oai-badge-gray-foreground: #5d5d5d;
+    --beyen-oai-badge-green: #e1f5e5;
+    --beyen-oai-badge-green-foreground: #008635;
+    --beyen-oai-badge-blue: #e4efff;
+    --beyen-oai-badge-blue-foreground: #004f99;
+    --beyen-oai-badge-red: #ffe2e0;
+    --beyen-oai-badge-red-foreground: #ba2723;
+    --beyen-oai-badge-purple: #e6dbf5;
+    --beyen-oai-badge-purple-foreground: #6c3bb4;
+    --beyen-console-table-header: #f9f9f9;
+    --beyen-console-table-hover: #f9f9f9;
 }
 
 .dark {
@@ -46,6 +82,16 @@
     --beyen-console-menu: #303030;
     --beyen-console-menu-hover: #454545;
     --beyen-console-search-hover: #3c3c3c;
-    --beyen-console-sidebar-tag: #271c36;
-    --beyen-console-sidebar-tag-foreground: #be95fa;
+    --beyen-oai-badge-gray: #3c3c3c;
+    --beyen-oai-badge-gray-foreground: #afafaf;
+    --beyen-oai-badge-green: #243828;
+    --beyen-oai-badge-green-foreground: #07b84c;
+    --beyen-oai-badge-blue: #232e3e;
+    --beyen-oai-badge-blue-foreground: #339cff;
+    --beyen-oai-badge-red: #452826;
+    --beyen-oai-badge-red-foreground: #fa423e;
+    --beyen-oai-badge-purple: #271c36;
+    --beyen-oai-badge-purple-foreground: #be95fa;
+    --beyen-console-table-header: #181818;
+    --beyen-console-table-hover: #161616;
 }

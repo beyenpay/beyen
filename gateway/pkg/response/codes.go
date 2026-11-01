@@ -27,4 +27,5 @@ const (
 	CodeProjectDisabled    = "PROJECT_DISABLED"  // the project is frozen by a platform admin
 	CodeSetupCompleted     = "SETUP_COMPLETED"   // first-run setup attempted while users already exist
 	CodeWeakPassword       = "WEAK_PASSWORD"     // new password breaks the password policy
+	CodeEmailTaken         = "EMAIL_TAKEN"       // creating a user whose email is already registered
 )

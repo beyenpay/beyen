@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import type { NavSection } from "@/config/nav"
 import { isSystemPermission } from "@/constants/permissions"
 import { usePermission } from "@/hooks/usePermission"
+import { ToneBadge } from "@/components/common/ToneBadge"
 
 export default function NavList({
     prefix,
@@ -49,20 +50,19 @@ export default function NavList({
                             <TooltipTrigger
                                 render={<Link to={to} />}
                                 aria-label={label}
-                                className={`flex h-9 items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ${
-                                    active
+                                className={`flex h-9 items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ${active
                                         ? "bg-beyen-console-sidebar-active font-medium"
                                         : "hover:bg-beyen-console-sidebar-hover"
-                                }`}
+                                    }`}
                             >
                                 {Icon && <Icon className="size-4.5 shrink-0" />}
                                 {showLabels && (
                                     <>
                                         <span className="flex-1">{label}</span>
                                         {s.tag && (
-                                            <span className="rounded-sm bg-beyen-console-sidebar-tag text-beyen-console-sidebar-tag-foreground px-2 py-0.5 text-xs font-medium ">
+                                            <ToneBadge tone="purple" className="rounded-sm">
                                                 {t(s.tag)}
-                                            </span>
+                                            </ToneBadge>
                                         )}
                                     </>
                                 )}

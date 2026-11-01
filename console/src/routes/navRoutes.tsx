@@ -14,6 +14,8 @@ const PAGES: Record<string, LazyExoticComponent<ComponentType>> = {
     "/console/home": lazy(() => import("@/pages/console/project/home/ProjectHomePage")),
     "/console/customers": lazy(() => import("@/pages/console/project/customers/CustomersPage")),
     "/console/developer/api-keys": lazy(() => import("@/pages/console/project/developer/ApiKeysPage")),
+    "/console/system/users": lazy(() => import("@/pages/console/system/users/UsersPage")),
+    "/console/system/overview": lazy(() => import("@/pages/console/system/overview/SystemOverviewPage"))
 }
 
 function page(path: string, label: ParseKeys): ReactNode {

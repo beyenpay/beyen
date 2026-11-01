@@ -24,6 +24,7 @@ func mountConsole(api *gin.RouterGroup, d Deps) {
 	meH := consolehandler.NewMeHandler(d.Me)
 	sessH := consolehandler.NewSessionHandler(d.Auth, cookie)
 	setupH := consolehandler.NewSetupHandler(d.User)
+	userH := consolehandler.NewUserHandler(d.User)
 
 	console := api.Group("/console",
 		middleware.CSRF(d.Config.App.PublicURL),
@@ -60,6 +61,10 @@ func mountConsole(api *gin.RouterGroup, d Deps) {
 	me.GET("/sessions", sessH.List)
 	me.DELETE("/sessions", sessH.RevokeAll)
 	me.DELETE("/sessions/:id", sessH.Revoke)
+
+	// System console: platform admins only.
+	authed.GET("/system/users", middleware.RequireSystem(permission.SystemUserRead), userH.List)
+	authed.POST("/system/users", middleware.RequireSystem(permission.SystemUserWrite), userH.Create)
 
 	// TEMP: probes to exercise the authz middleware. Delete once real system
 	// and project routes exist.

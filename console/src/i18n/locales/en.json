@@ -21,7 +21,8 @@
       "TOO_MANY_ATTEMPTS": "Too many attempts. Please try again later.",
       "PROJECT_DISABLED": "This project is disabled.",
       "SETUP_COMPLETED": "The system has already been set up.",
-      "WEAK_PASSWORD": "Password does not meet the policy: 8–128 characters with a letter and a digit, and it must not contain the email name."
+      "WEAK_PASSWORD": "Password does not meet the policy: 8–128 characters with a letter and a digit, and it must not contain the email name.",
+      "EMAIL_TAKEN": "This email is already registered."
     }
   },
   "site": {
@@ -45,6 +46,60 @@
     "passwordHint": "8–128 characters with at least one letter and one digit.",
     "confirmPassword": "Confirm password",
     "submit": "Create administrator"
+  },
+  "dataTable": {
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailed": "Could not copy. Please copy it manually.",
+    "filters": "Filters",
+    "filtersActive": "{{n}} filter(s)",
+    "clear": "Clear",
+    "any": "Any",
+    "from": "From",
+    "to": "To",
+    "selected": "{{n}} selected",
+    "clearSelection": "Clear selection",
+    "selectAll": "Select all",
+    "selectRow": "Select row",
+    "moreActions": "More actions",
+    "prev": "Previous page",
+    "next": "Next page",
+    "range": "{{from}}-{{to}} of {{total}} results",
+    "noResults": "0 results",
+    "loading": "Loading…",
+    "empty": "No results match.",
+    "error": "Failed to load.",
+    "retry": "Try again"
+  },
+  "users": {
+    "email": "Email",
+    "role": "Role",
+    "created": "Created",
+    "updated": "Updated",
+    "roleHint": "Admins can open the system console and hold every project's permissions.",
+    "statusHint": "A disabled account cannot sign in.",
+    "searchPlaceholder": "Part of an email",
+    "copyEmail": "Copy email",
+    "copyId": "Copy user ID",
+    "copyEmails": "Copy emails",
+    "roles": { "admin": "Admin", "user": "User" },
+    "status": { "label": "Status", "active": "Active", "disabled": "Disabled", "deleted": "Deleted" },
+    "presets": { "all": "All", "active": "Active", "disabled": "Disabled", "admins": "Admins" },
+    "detail": { "title": "User details", "description": "Basic information about this user." },
+    "create": {
+      "button": "Create user",
+      "title": "Create user",
+      "role": "Role",
+      "userHint": "A user can only access the projects they are added to.",
+      "adminHint": "An admin can open the system console and holds every project's permissions.",
+      "emailPlaceholder": "user@example.com",
+      "password": "Initial password",
+      "passwordHint": "8–128 characters with at least one letter and one digit, not containing the email name.",
+      "generate": "Generate",
+      "cancel": "Cancel",
+      "submit": "Create",
+      "created": "Created user {{email}}"
+    }
   },
   "validation": {
     "emailInvalid": "Enter a valid email address.",
