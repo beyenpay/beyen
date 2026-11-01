@@ -1,5 +1,5 @@
 import { InfoIcon, MoreHorizontalIcon, XIcon } from "lucide-react"
-import { Fragment, useEffect, useRef, useState, type ReactNode } from "react"
+import { Fragment, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
@@ -59,6 +59,17 @@ function isInteractive(target: EventTarget) {
     return target instanceof Element && target.closest(INTERACTIVE) !== null
 }
 
+// The nearest ancestor that scrolls; null when the page itself does.
+function scrollParent(el: HTMLElement) {
+    for (let p = el.parentElement; p; p = p.parentElement) {
+        const { overflowX, overflowY } = getComputedStyle(p)
+        if (/auto|scroll/.test(overflowX + overflowY)) {
+            return p
+        }
+    }
+    return null
+}
+
 // Strings and numbers get the truncate-with-tooltip treatment; anything else
 // is the page's own component and is left alone.
 function renderCell(node: ReactNode) {
@@ -88,24 +99,40 @@ export function DataTable<T>({
     const { t } = useTranslation()
     const [detail, setDetail] = useState<{ row: T } | null>(null)
 
+    // The page scrolls, not the table: the filter bar and the header stick to
+    // the top of the nearest scrolling ancestor, and the rows scroll under them.
+    // When the table is wider than that ancestor it scrolls sideways, so the
+    // parts that must stay in view (toolbar, pagination, bulk bar, fade) are
+    // sized to what is visible; `view` is that size, in pixels.
+    const rootRef = useRef<HTMLDivElement>(null)
+    const [view, setView] = useState<{ box: number; content: number } | null>(null)
     // True while the table is cut off on the right, to show the fade there.
-    const wrapRef = useRef<HTMLDivElement>(null)
     const [moreRight, setMoreRight] = useState(false)
-    useEffect(() => {
-        const scroller = wrapRef.current?.querySelector<HTMLElement>("[data-slot=table-container]")
-        if (!scroller) {
+    // True once the table has scrolled up under the toolbar, which is then stuck.
+    const [stuck, setStuck] = useState(false)
+    useLayoutEffect(() => {
+        const root = rootRef.current
+        const scroller = root && scrollParent(root)
+        if (!root || !scroller) {
             return
         }
-        const update = () =>
-            setMoreRight(scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1)
+        const update = () => {
+            const style = getComputedStyle(scroller)
+            const box = scroller.clientWidth
+            const content = box - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+            // The same numbers again keep the old object, so scrolling down does not re-render.
+            setView((prev) => (prev?.box === box && prev.content === content ? prev : { box, content }))
+            setMoreRight(scroller.scrollLeft + box < scroller.scrollWidth - 1)
+            // The toolbar sticks at the scroller's content edge, below its top padding.
+            const edge = scroller.getBoundingClientRect().top + scroller.clientTop + parseFloat(style.paddingTop)
+            setStuck(root.getBoundingClientRect().top < edge - 1)
+        }
         update()
         scroller.addEventListener("scroll", update, { passive: true })
-        // Both the box and the table inside it: either one changing size changes the answer.
+        // The scroller changing size or the table inside it changing size both change the answer.
         const observer = new ResizeObserver(update)
         observer.observe(scroller)
-        if (scroller.firstElementChild) {
-            observer.observe(scroller.firstElementChild)
-        }
+        observer.observe(root)
         return () => {
             scroller.removeEventListener("scroll", update)
             observer.disconnect()
@@ -135,13 +162,32 @@ export function DataTable<T>({
         select(next)
     }
 
+    const hasToolbar = !!presets?.length || !!filters?.length
+
     return (
-        <div className="flex min-h-full flex-col">
+        <div
+            ref={rootRef}
+            data-stuck={stuck}
+            className="group/dt flex min-h-full flex-col"
+            // As wide as the table, so what sticks sideways has room to move in.
+            // --dt-w: the scroller's visible width; --dt-cw: the same without its padding.
+            style={
+                {
+                    minWidth,
+                    "--dt-w": view ? `${view.box}px` : "100%",
+                    "--dt-cw": view ? `${view.content}px` : "100%",
+                } as CSSProperties
+            }
+        >
             <DataTableToolbar params={params} presets={presets} filters={filters} />
 
             <div
-                ref={wrapRef}
-                className={cn("relative flex-1", isFetching && !isLoading && "opacity-60 transition-opacity")}
+                // The table's own box must not scroll: a sticky header only sticks to the
+                // nearest scrolling ancestor, and that has to be the page.
+                className={cn(
+                    "relative flex-1 *:data-[slot=table-container]:overflow-visible",
+                    isFetching && !isLoading && "opacity-60 transition-opacity",
+                )}
             >
                 <Table className="table-fixed" style={{ minWidth }}>
                     <colgroup>
@@ -151,7 +197,8 @@ export function DataTable<T>({
                         ))}
                         {hasRowActions && <col style={{ width: 1 }} />}
                     </colgroup>
-                    <TableHeader className="[&_tr]:border-b-0">
+                    {/* Under the toolbar when there is one (its h-12). */}
+                    <TableHeader className={cn("sticky z-20 [&_tr]:border-b-0", hasToolbar ? "top-12" : "-top-3")}>
                         <TableRow>
                             {selectable && (
                                 <TableHead className="h-8">
@@ -261,21 +308,25 @@ export function DataTable<T>({
                     </TableBody>
                 </Table>
 
-                {/* Fades the right edge while more columns are scrolled out of sight. */}
-                <div
-                    aria-hidden
-                    className={cn(
-                        "pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-beyen-console-surface to-transparent transition-opacity",
-                        moreRight ? "opacity-100" : "opacity-0",
-                    )}
-                />
+                {/* Fades the visible right edge while more columns are scrolled out of sight.
+                    The sticky layer follows the scroll; the gradient sits at its right end. */}
+                <div aria-hidden className="pointer-events-none absolute inset-0">
+                    <div className="sticky left-0 h-full w-(--dt-cw)">
+                        <div
+                            className={cn(
+                                "absolute inset-y-0 right-0 w-16 bg-linear-to-l from-beyen-console-surface to-transparent transition-opacity",
+                                moreRight ? "opacity-100" : "opacity-0",
+                            )}
+                        />
+                    </div>
+                </div>
             </div>
 
             <DataTablePagination params={params} total={total} />
 
             {bulkActions && selectedRows.length > 0 && (
                 // Zero height and sticky: the bar floats above the pagination without taking room.
-                <div className="sticky bottom-16 z-20 h-0">
+                <div className="sticky bottom-16 left-0 z-20 h-0 w-(--dt-cw)">
                     <div className="absolute bottom-0 left-1/2 flex min-w-md -translate-x-1/2 items-center justify-between gap-6 rounded-sm bg-foreground py-2 pr-2 pl-4 text-sm text-background shadow-lg">
                         <span className="whitespace-nowrap">
                             {t("dataTable.selected", { n: selectedRows.length })}
@@ -312,7 +363,7 @@ export function DataTable<T>({
             )}
 
             {renderDetail && (
-                <Dialog open={detail !== null} onOpenChange={(open) => !open && setDetail(null)}>
+                <Dialog open={detail !== null} onOpenChange={(open: boolean) => !open && setDetail(null)}>
                     <DialogContent className="sm:max-w-lg">
                         {detail && renderDetail(detail.row, () => setDetail(null))}
                     </DialogContent>

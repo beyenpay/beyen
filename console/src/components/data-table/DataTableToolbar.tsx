@@ -46,7 +46,11 @@ export function DataTableToolbar({
     const managed = managedKeys(presets ?? [])
 
     return (
-        <div className="flex items-center justify-between gap-3 pb-3">
+        // Sticks at the scroller's content edge and stays in view sideways. The fixed
+        // h-12 is what the table header's top-12 counts on. Once stuck, the ::before
+        // strip fills the scroller's top padding above it, so no row shows through
+        // and the bar keeps a little room; unstuck it is invisible and covers nothing.
+        <div className="sticky top-0 left-0 z-30 flex h-12 w-(--dt-cw) shrink-0 items-center justify-between gap-3 bg-beyen-console-surface pb-3 before:absolute before:inset-x-0 before:bottom-full before:h-3 before:bg-beyen-console-surface before:opacity-0 group-data-[stuck=true]/dt:before:opacity-100">
             <div className="flex min-w-0 gap-2 overflow-x-auto">
                 {presets?.map((p) => (
                     <Button
