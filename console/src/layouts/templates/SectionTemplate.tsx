@@ -44,6 +44,7 @@ export function SectionTemplate({ section }: { section: NavSection }) {
                         </nav>
                     )}
                 </header>
+                {/* console layout main x */}
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-6 pt-3">
                     <Outlet />
                 </div>

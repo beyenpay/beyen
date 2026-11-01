@@ -240,35 +240,37 @@ export function DataTable<T>({
             {bulkActions && selectedRows.length > 0 && (
                 // Zero height and sticky: the bar floats above the pagination without taking room.
                 <div className="sticky bottom-16 z-20 h-0">
-                    <div className="absolute bottom-0 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-xl bg-foreground py-2 pr-2 pl-4 text-sm text-background shadow-lg">
-                        <span className="mr-3 whitespace-nowrap">
+                    <div className="absolute bottom-0 left-1/2 flex min-w-md -translate-x-1/2 items-center justify-between gap-6 rounded-xl bg-foreground py-2 pr-2 pl-4 text-sm text-background shadow-lg">
+                        <span className="whitespace-nowrap">
                             {t("dataTable.selected", { n: selectedRows.length })}
                         </span>
-                        {bulkActions.map((a) => (
+                        <div className="flex items-center gap-1">
+                            {bulkActions.map((a) => (
+                                <Button
+                                    key={a.id}
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                        "text-background hover:bg-background/15 hover:text-background dark:hover:bg-background/15",
+                                        a.destructive && "text-red-400 hover:text-red-400",
+                                    )}
+                                    onClick={() => a.onSelect(selectedRows, () => select(new Set()))}
+                                >
+                                    {a.icon && <a.icon />}
+                                    {a.label}
+                                </Button>
+                            ))}
+                            <span className="mx-1 h-5 w-px bg-background/25" />
                             <Button
-                                key={a.id}
                                 variant="ghost"
-                                size="sm"
-                                className={cn(
-                                    "text-background hover:bg-background/15 hover:text-background",
-                                    a.destructive && "text-red-400 hover:text-red-400",
-                                )}
-                                onClick={() => a.onSelect(selectedRows, () => select(new Set()))}
+                                size="icon-sm"
+                                className="text-background hover:bg-background/15 hover:text-background dark:hover:bg-background/15"
+                                aria-label={t("dataTable.clearSelection")}
+                                onClick={() => select(new Set())}
                             >
-                                {a.icon && <a.icon />}
-                                {a.label}
+                                <XIcon />
                             </Button>
-                        ))}
-                        <span className="mx-1 h-5 w-px bg-background/25" />
-                        <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="text-background hover:bg-background/15 hover:text-background"
-                            aria-label={t("dataTable.clearSelection")}
-                            onClick={() => select(new Set())}
-                        >
-                            <XIcon />
-                        </Button>
+                        </div>
                     </div>
                 </div>
             )}

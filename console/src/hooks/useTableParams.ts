@@ -1,24 +1,31 @@
 import { useCallback, useMemo } from "react"
 import { useSearchParams } from "react-router"
 
+export const PAGE_SIZES = [20, 50, 100] as const
+
 export type TableParams = {
     page: number
     pageSize: number
     // Only the filters that have a value.
     filters: Record<string, string>
     setPage: (page: number) => void
+    // Goes back to page 1, since the old page number means something else now.
+    setPageSize: (size: number) => void
     // Replaces every filter of this table and goes back to page 1.
     setFilters: (filters: Record<string, string>) => void
 }
 
 // Table state lives in the URL (?page=2&status=1), so a reload or a shared
 // link shows the same rows. `keys` lists the filter parameters this table owns.
-export function useTableParams(keys: string[], pageSize = 20): TableParams {
+export function useTableParams(keys: string[]): TableParams {
     const [search, setSearch] = useSearchParams()
     // A string, so the hooks below do not depend on the identity of `keys`.
     const keySig = keys.join(",")
 
     const page = Math.max(1, Math.floor(Number(search.get("page"))) || 1)
+    // Anything outside PAGE_SIZES falls back to the first (default) size.
+    const sizeParam = Number(search.get("size"))
+    const pageSize = PAGE_SIZES.find((s) => s === sizeParam) ?? PAGE_SIZES[0]
 
     const filters = useMemo(() => {
         const out: Record<string, string> = {}
@@ -50,6 +57,25 @@ export function useTableParams(keys: string[], pageSize = 20): TableParams {
         [setSearch],
     )
 
+    const setPageSize = useCallback(
+        (next: number) => {
+            setSearch(
+                (prev) => {
+                    const p = new URLSearchParams(prev)
+                    if (next === PAGE_SIZES[0]) {
+                        p.delete("size")
+                    } else {
+                        p.set("size", String(next))
+                    }
+                    p.delete("page")
+                    return p
+                },
+                { replace: true },
+            )
+        },
+        [setSearch],
+    )
+
     const setFilters = useCallback(
         (next: Record<string, string>) => {
             setSearch(
@@ -72,5 +98,5 @@ export function useTableParams(keys: string[], pageSize = 20): TableParams {
         [setSearch, keySig],
     )
 
-    return { page, pageSize, filters, setPage, setFilters }
+    return { page, pageSize, filters, setPage, setPageSize, setFilters }
 }

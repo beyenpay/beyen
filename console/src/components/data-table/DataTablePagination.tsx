@@ -2,7 +2,16 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
-import type { TableParams } from "@/hooks/useTableParams"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { PAGE_SIZES, type TableParams } from "@/hooks/useTableParams"
 
 // Previous / next only, plus the range and the total. Pinned to the bottom of
 // the scrolling area so it stays in reach on a long page.
@@ -12,7 +21,7 @@ export function DataTablePagination({ params, total }: { params: TableParams; to
     const n = (v: number) => v.toLocaleString()
 
     return (
-        <div className="sticky bottom-0 z-10 flex h-8 shrink-0 items-center gap-1 bg-beyen-console-table-header text-xs text-muted-foreground">
+        <div className="sticky bottom-0 z-10 flex h-9 shrink-0 items-center gap-1 bg-beyen-console-table-header text-xs text-muted-foreground">
             <Button
                 variant="ghost"
                 size="icon-sm"
@@ -31,15 +40,36 @@ export function DataTablePagination({ params, total }: { params: TableParams; to
             >
                 <ChevronRightIcon />
             </Button>
-            <span className="ml-2">
-                {total === 0
-                    ? t("dataTable.noResults")
-                    : t("dataTable.range", {
-                          from: n((page - 1) * pageSize + 1),
-                          to: n(Math.min(page * pageSize, total)),
-                          total: n(total),
-                      })}
-            </span>
+            <DropdownMenu>
+                <DropdownMenuTrigger
+                    render={
+                        <Button variant="ghost" size="sm" className="ml-1 font-normal text-muted-foreground" />
+                    }
+                >
+                    {total === 0
+                        ? t("dataTable.noResults")
+                        : t("dataTable.range", {
+                              from: n((page - 1) * pageSize + 1),
+                              to: n(Math.min(page * pageSize, total)),
+                              total: n(total),
+                          })}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top" className="w-44">
+                    <DropdownMenuGroup>
+                        <DropdownMenuLabel>{t("dataTable.pageSize")}</DropdownMenuLabel>
+                        <DropdownMenuRadioGroup
+                            value={String(pageSize)}
+                            onValueChange={(v) => params.setPageSize(Number(v))}
+                        >
+                            {PAGE_SIZES.map((s) => (
+                                <DropdownMenuRadioItem key={s} value={String(s)} closeOnClick>
+                                    {s}
+                                </DropdownMenuRadioItem>
+                            ))}
+                        </DropdownMenuRadioGroup>
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     )
 }

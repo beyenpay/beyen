@@ -66,6 +66,7 @@
     "next": "Next page",
     "range": "{{from}}-{{to}} of {{total}} results",
     "noResults": "0 results",
+    "pageSize": "Results per page",
     "loading": "Loading…",
     "empty": "No results match.",
     "error": "Failed to load.",

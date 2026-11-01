@@ -42,10 +42,10 @@ export function DataTableToolbar({
                     <Button
                         key={p.id}
                         variant="outline"
-                        size="sm"
+                        size="lg"
                         // The chip that matches the current filters is the active one.
                         aria-pressed={sameFilters(p.filters, params.filters)}
-                        className="aria-pressed:border-foreground aria-pressed:ring-1 aria-pressed:ring-foreground"
+                        className="rounded-md border-border/60 px-4 aria-pressed:border-foreground aria-pressed:ring-1 aria-pressed:ring-inset aria-pressed:ring-foreground"
                         onClick={() => params.setFilters(p.filters)}
                     >
                         {p.label}
@@ -67,7 +67,7 @@ function FilterPopover({ defs, params }: { defs: FilterDef[]; params: TableParam
 
     return (
         <Popover>
-            <PopoverTrigger render={<Button variant="outline" size="sm" className="shrink-0" />}>
+            <PopoverTrigger render={<Button variant="outline" size="lg" className="shrink-0" />}>
                 <ListFilterIcon />
                 {count > 0 ? t("dataTable.filtersActive", { n: count }) : t("dataTable.filters")}
             </PopoverTrigger>
@@ -75,7 +75,7 @@ function FilterPopover({ defs, params }: { defs: FilterDef[]; params: TableParam
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{t("dataTable.filters")}</span>
                     {count > 0 && (
-                        <Button variant="ghost" size="xs" onClick={() => params.setFilters({})}>
+                        <Button variant="ghost" size="sm" onClick={() => params.setFilters({})}>
                             {t("dataTable.clear")}
                         </Button>
                     )}
