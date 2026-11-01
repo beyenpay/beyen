@@ -19,6 +19,7 @@ var (
 	ErrInvalidEmail   = errors.New("invalid email address")
 	ErrEmailTaken     = errors.New("email is already registered")
 	ErrInvalidRole    = errors.New("invalid system role")
+	ErrInvalidSort    = errors.New("invalid sort field")
 	ErrWeakPassword   = errors.New("weak password") // wrapped with the reason
 	ErrNotFound       = errors.New("user not found")
 	ErrSetupCompleted = errors.New("setup already completed")
@@ -88,6 +89,8 @@ const (
 // ListInput is a page request plus optional filters; zero means "no condition".
 type ListInput struct {
 	Page, PageSize int
+	Sort           string // a sortable field of the listing; empty means newest first
+	SortDesc       bool
 	Email          string // substring, or the whole address when EmailExact
 	EmailExact     bool
 	Status         model.UserStatus
@@ -104,6 +107,9 @@ type ListResult struct {
 
 // List returns one page of users, newest first.
 func (s *Service) List(ctx context.Context, in ListInput) (*ListResult, error) {
+	if !repository.ValidUserSort(in.Sort) {
+		return nil, ErrInvalidSort
+	}
 	if in.Page < 1 {
 		in.Page = 1
 	}
@@ -112,7 +118,7 @@ func (s *Service) List(ctx context.Context, in ListInput) (*ListResult, error) {
 	}
 	in.PageSize = min(in.PageSize, maxPageSize)
 
-	users, total, err := s.users.List(ctx, repository.UserFilter{
+	users, total, err := s.users.List(ctx, repository.UserSort{Key: in.Sort, Desc: in.SortDesc}, repository.UserFilter{
 		Email:       email.Normalize(in.Email),
 		EmailExact:  in.EmailExact,
 		Status:      in.Status,

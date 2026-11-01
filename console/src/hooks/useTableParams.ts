@@ -11,6 +11,10 @@ export type TableParams = {
     setPage: (page: number) => void
     // Goes back to page 1, since the old page number means something else now.
     setPageSize: (size: number) => void
+    // null means the endpoint's own order.
+    sort: { key: string; dir: "asc" | "desc" } | null
+    // Cycles asc, desc, off for one field, and goes back to page 1.
+    toggleSort: (key: string) => void
     // Replaces every filter of this table and goes back to page 1.
     setFilters: (filters: Record<string, string>) => void
 }
@@ -26,6 +30,15 @@ export function useTableParams(keys: string[]): TableParams {
     // Anything outside PAGE_SIZES falls back to the first (default) size.
     const sizeParam = Number(search.get("size"))
     const pageSize = PAGE_SIZES.find((s) => s === sizeParam) ?? PAGE_SIZES[0]
+
+    // `?sort=created&dir=asc`. Without a key there is no sort. The endpoint
+    // rejects keys it does not know, so a bad URL shows an error, not wrong rows.
+    const sortKey = search.get("sort")
+    const sortDir = search.get("dir") === "asc" ? "asc" : "desc"
+    const sort = useMemo(
+        () => (sortKey ? { key: sortKey, dir: sortDir as "asc" | "desc" } : null),
+        [sortKey, sortDir],
+    )
 
     const filters = useMemo(() => {
         const out: Record<string, string> = {}
@@ -76,6 +89,32 @@ export function useTableParams(keys: string[]): TableParams {
         [setSearch],
     )
 
+    const toggleSort = useCallback(
+        (key: string) => {
+            setSearch(
+                (prev) => {
+                    const p = new URLSearchParams(prev)
+                    const same = p.get("sort") === key
+                    const dir = p.get("dir") === "asc" ? "asc" : "desc"
+                    p.delete("sort")
+                    p.delete("dir")
+                    // First click: ascending. Second: descending. Third: off.
+                    if (!same) {
+                        p.set("sort", key)
+                        p.set("dir", "asc")
+                    } else if (dir === "asc") {
+                        p.set("sort", key)
+                        p.set("dir", "desc")
+                    }
+                    p.delete("page")
+                    return p
+                },
+                { replace: true },
+            )
+        },
+        [setSearch],
+    )
+
     const setFilters = useCallback(
         (next: Record<string, string>) => {
             setSearch(
@@ -98,5 +137,5 @@ export function useTableParams(keys: string[]): TableParams {
         [setSearch, keySig],
     )
 
-    return { page, pageSize, filters, setPage, setPageSize, setFilters }
+    return { page, pageSize, filters, setPage, setPageSize, sort, toggleSort, setFilters }
 }

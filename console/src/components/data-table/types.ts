@@ -15,6 +15,9 @@ export type Column<T> = {
     // A column without one shares whatever room is left.
     width?: number
     align?: "left" | "right"
+    // Makes the header clickable to sort by this field. It is the value sent
+    // as `sort`, so it must be one the endpoint accepts. No key, no sorting.
+    sortKey?: string
 }
 
 export type RowAction<T> = {

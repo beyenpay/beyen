@@ -48,6 +48,48 @@ func (r *UserRepo) Count(ctx context.Context) (int64, error) {
 	return n, nil
 }
 
+// userSortColumns is the one list of what a user listing can be sorted by: the
+// name the API accepts, and the column behind it. The value goes into SQL, so
+// nothing a client sends may reach ORDER BY except through this map. A new
+// sortable field is one more line here.
+var userSortColumns = map[string]string{
+	"id":      "id",
+	"email":   "email",
+	"created": "created_at",
+}
+
+// ValidUserSort reports whether key is empty (the default order) or a sortable field.
+func ValidUserSort(key string) bool {
+	if key == "" {
+		return true
+	}
+	_, ok := userSortColumns[key]
+	return ok
+}
+
+// UserSort is the requested order. A zero value means newest first.
+type UserSort struct {
+	Key  string
+	Desc bool
+}
+
+// orderBy is the ORDER BY clause. id is always the last key, so rows that tie
+// on the chosen column keep one stable order and paging neither repeats nor skips any.
+func (s UserSort) orderBy() string {
+	col, ok := userSortColumns[s.Key]
+	if !ok {
+		return "id DESC"
+	}
+	dir := "ASC"
+	if s.Desc {
+		dir = "DESC"
+	}
+	if col == "id" {
+		return "id " + dir
+	}
+	return col + " " + dir + ", id DESC"
+}
+
 // UserFilter narrows a user listing. Zero values mean "no condition".
 type UserFilter struct {
 	Email       string           // already normalized to lower case
@@ -98,7 +140,7 @@ func (f UserFilter) apply(db *gorm.DB) *gorm.DB {
 }
 
 // List returns one page of users, newest first, and how many users match in total.
-func (r *UserRepo) List(ctx context.Context, f UserFilter, offset, limit int) ([]model.User, int64, error) {
+func (r *UserRepo) List(ctx context.Context, sort UserSort, f UserFilter, offset, limit int) ([]model.User, int64, error) {
 	// A *gorm.DB must not be reused after a finisher, so each query builds its own.
 	query := func() *gorm.DB { return f.apply(r.db.WithContext(ctx).Model(&model.User{})) }
 
@@ -110,7 +152,7 @@ func (r *UserRepo) List(ctx context.Context, f UserFilter, offset, limit int) ([
 	if total == 0 {
 		return users, 0, nil
 	}
-	if err := query().Order("id DESC").Offset(offset).Limit(limit).Find(&users).Error; err != nil {
+	if err := query().Order(sort.orderBy()).Offset(offset).Limit(limit).Find(&users).Error; err != nil {
 		return nil, 0, fmt.Errorf("list users: %w", err)
 	}
 	return users, total, nil

@@ -6,6 +6,8 @@ import type { UserRow } from "@/types/user"
 export type ListUsersParams = {
     page: number
     pageSize: number
+    // Field name and direction, or null for the endpoint's own order (newest first).
+    sort: { key: string; dir: "asc" | "desc" } | null
     // The table's URL filters: q, q_op (eq | contains), status, role (a,b),
     // created_from and created_to (unix seconds, inclusive).
     filters: Record<string, string>
@@ -14,12 +16,14 @@ export type ListUsersParams = {
 // Digits only; anything else in a hand-edited URL is dropped instead of sent.
 const unix = (v: string | undefined) => (v && /^\d+$/.test(v) ? v : undefined)
 
-export function listUsers({ page, pageSize, filters }: ListUsersParams, signal?: AbortSignal) {
+export function listUsers({ page, pageSize, sort, filters }: ListUsersParams, signal?: AbortSignal) {
     return api.get<Page<UserRow>>("/console/system/users", {
         signal,
         query: {
             page,
             page_size: pageSize,
+            sort: sort?.key,
+            dir: sort?.dir,
             q: filters.q,
             q_op: filters.q_op,
             status: filters.status,

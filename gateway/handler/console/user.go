@@ -39,6 +39,8 @@ func (h *UserHandler) List(c *gin.Context) {
 	res, err := h.svc.List(c.Request.Context(), user.ListInput{
 		Page:        req.Page,
 		PageSize:    req.PageSize,
+		Sort:        req.Sort,
+		SortDesc:    req.Dir != "asc",
 		Email:       req.Q,
 		EmailExact:  req.QOp == "eq",
 		Status:      model.UserStatus(req.Status),
@@ -46,6 +48,10 @@ func (h *UserHandler) List(c *gin.Context) {
 		CreatedFrom: req.CreatedFrom,
 		CreatedTo:   req.CreatedTo,
 	})
+	if errors.Is(err, user.ErrInvalidSort) {
+		response.Fail(c, response.ErrInvalidParams)
+		return
+	}
 	if err != nil {
 		logger.Error("list users failed", zap.Error(err))
 		response.Fail(c, response.ErrInternal)

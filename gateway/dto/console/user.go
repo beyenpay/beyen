@@ -19,6 +19,8 @@ type CreateUserRequest struct {
 type ListUsersRequest struct {
 	Page        int    `form:"page" binding:"omitempty,min=1,max=100000"`
 	PageSize    int    `form:"page_size" binding:"omitempty,min=1,max=100"`
+	Sort        string `form:"sort" binding:"omitempty,max=32"`        // checked against the sortable fields in the service
+	Dir         string `form:"dir" binding:"omitempty,oneof=asc desc"` // empty means desc
 	Q           string `form:"q" binding:"omitempty,max=255"`
 	QOp         string `form:"q_op" binding:"omitempty,oneof=eq contains"` // empty means contains
 	Status      int    `form:"status" binding:"omitempty,oneof=1 2 3"`

@@ -1,4 +1,4 @@
-import { InfoIcon, MoreHorizontalIcon, XIcon } from "lucide-react"
+import { ArrowDownIcon, ArrowUpIcon, InfoIcon, MoreHorizontalIcon, XIcon } from "lucide-react"
 import { Fragment, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -221,7 +221,16 @@ export function DataTable<T>({
                                     )}
                                 >
                                     <span className="inline-flex items-center gap-1">
-                                        {c.header}
+                                        {c.sortKey ? (
+                                            <SortButton
+                                                dir={params.sort?.key === c.sortKey ? params.sort.dir : null}
+                                                onClick={() => params.toggleSort(c.sortKey!)}
+                                            >
+                                                {c.header}
+                                            </SortButton>
+                                        ) : (
+                                            c.header
+                                        )}
                                         {c.hint && <ColumnHint>{c.hint}</ColumnHint>}
                                     </span>
                                 </TableHead>
@@ -380,6 +389,38 @@ function StateRow({ colSpan, children }: { colSpan: number; children: ReactNode 
                 <div className="flex flex-col items-center gap-3">{children}</div>
             </TableCell>
         </TableRow>
+    )
+}
+
+// A column header that sorts on click. The arrow shows the current direction
+// and appears faintly on hover, so it is clear the header can be clicked.
+function SortButton({
+    dir,
+    onClick,
+    children,
+}: {
+    dir: "asc" | "desc" | null
+    onClick: () => void
+    children: ReactNode
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            aria-sort={dir === "asc" ? "ascending" : dir === "desc" ? "descending" : "none"}
+            className="group/sort -mx-1 inline-flex items-center gap-1 rounded px-1 outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+            {children}
+            <span className="flex size-3 items-center justify-center">
+                {dir === "asc" ? (
+                    <ArrowUpIcon className="size-3 text-foreground" />
+                ) : dir === "desc" ? (
+                    <ArrowDownIcon className="size-3 text-foreground" />
+                ) : (
+                    <ArrowUpIcon className="size-3 opacity-0 transition-opacity group-hover/sort:opacity-50" />
+                )}
+            </span>
+        </button>
     )
 }
 

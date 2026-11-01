@@ -87,11 +87,12 @@ export default function UsersPage() {
   ]
 
   const columns: Column<UserRow>[] = [
-    { id: "id", header: "ID", width: 80, cell: (u) => u.id },
+    { id: "id", header: "ID", width: 80, sortKey: "id", cell: (u) => u.id },
     {
       id: "email",
       header: t("users.email"),
       width: 320,
+      sortKey: "email",
       cell: (u) => <CopyText value={u.email} mono={false} />,
     },
     {
@@ -112,6 +113,7 @@ export default function UsersPage() {
       id: "created",
       header: t("users.created"),
       width: 180,
+      sortKey: "created",
       cell: (u) => formatDateTime(u.created_at),
     },
   ]
@@ -152,6 +154,7 @@ export default function UsersPage() {
   const { data, isPending, isFetching, isError, refetch } = useUsers({
     page: table.page,
     pageSize: table.pageSize,
+    sort: table.sort,
     filters: table.filters,
   })
 
