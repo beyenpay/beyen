@@ -73,6 +73,8 @@
     "range": "第 {{from}}-{{to}} 个结果，共 {{total}} 个结果",
     "noResults": "0 个结果",
     "pageSize": "每页结果数",
+    "close": "关闭",
+    "metadata": "元数据",
     "loading": "加载中…",
     "empty": "没有符合条件的结果。",
     "error": "加载失败。",

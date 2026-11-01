@@ -20,6 +20,45 @@ export type Column<T> = {
     sortKey?: string
 }
 
+export type DetailItem = { label: ReactNode; value: ReactNode }
+
+// A block of the detail dialog below the metadata: notes, warnings, a second list.
+export type DetailSection = {
+    title?: ReactNode
+    description?: ReactNode
+    items?: DetailItem[]
+    // Anything else; shown under the description and the items.
+    content?: ReactNode
+}
+
+// A button on the right of the dialog's footer. Close is always there, on the left.
+export type DetailAction = {
+    id: string
+    label: string
+    icon?: LucideIcon
+    // A path inside the app ("/console/...") navigates without a reload; a URL
+    // starting with http opens in a new tab. Without one, onSelect decides.
+    href?: string
+    onSelect?: () => void
+    // The dialog closes after the button is used, unless this is set.
+    keepOpen?: boolean
+    // Default "default" (the filled one); give "outline" for secondary buttons.
+    variant?: "default" | "outline" | "secondary" | "ghost" | "destructive"
+}
+
+// What the dialog of one row shows. The data table draws it.
+export type DetailContent = {
+    title: ReactNode
+    description?: ReactNode
+    // The core fields, listed under a heading (metadataTitle, "Metadata" by default).
+    metadata?: DetailItem[]
+    metadataTitle?: ReactNode
+    sections?: DetailSection[]
+    actions?: DetailAction[]
+    // Default "md".
+    size?: "sm" | "md" | "lg"
+}
+
 export type RowAction<T> = {
     id: string
     label: string

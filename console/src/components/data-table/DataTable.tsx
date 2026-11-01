@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,7 +27,8 @@ import { cn } from "@/lib/utils"
 import { TruncatedText } from "./cells"
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar } from "./DataTableToolbar"
-import type { BulkAction, Column, FilterDef, Preset, RowAction, RowKey } from "./types"
+import { DetailDialog } from "./DetailDialog"
+import type { BulkAction, Column, DetailContent, FilterDef, Preset, RowAction, RowKey } from "./types"
 
 export type DataTableProps<T> = {
     columns: Column<T>[]
@@ -46,8 +46,8 @@ export type DataTableProps<T> = {
     rowActions?: RowAction<T>[]
     // Giving some adds the checkboxes and the floating bar.
     bulkActions?: BulkAction<T>[]
-    // Giving it makes rows clickable; the returned content fills a dialog.
-    renderDetail?: (row: T, close: () => void) => ReactNode
+    // Giving it makes rows clickable; what it returns is drawn as a dialog.
+    renderDetail?: (row: T) => DetailContent
 }
 
 const NO_SELECTION = new Set<RowKey>()
@@ -97,7 +97,8 @@ export function DataTable<T>({
     renderDetail,
 }: DataTableProps<T>) {
     const { t } = useTranslation()
-    const [detail, setDetail] = useState<{ row: T } | null>(null)
+    // The row stays set after closing, so the dialog keeps its content while it fades out.
+    const [detail, setDetail] = useState<{ row: T; open: boolean } | null>(null)
 
     // The page scrolls, not the table: the filter bar and the header stick to
     // the top of the nearest scrolling ancestor, and the rows scroll under them.
@@ -273,7 +274,7 @@ export function DataTable<T>({
                                             renderDetail
                                                 ? (e) => {
                                                     if (!isInteractive(e.target)) {
-                                                        setDetail({ row })
+                                                        setDetail({ row, open: true })
                                                     }
                                                 }
                                                 : undefined
@@ -282,7 +283,7 @@ export function DataTable<T>({
                                             renderDetail
                                                 ? (e) => {
                                                     if (e.key === "Enter" && e.target === e.currentTarget) {
-                                                        setDetail({ row })
+                                                        setDetail({ row, open: true })
                                                     }
                                                 }
                                                 : undefined
@@ -372,11 +373,11 @@ export function DataTable<T>({
             )}
 
             {renderDetail && (
-                <Dialog open={detail !== null} onOpenChange={(open: boolean) => !open && setDetail(null)}>
-                    <DialogContent className="sm:max-w-lg">
-                        {detail && renderDetail(detail.row, () => setDetail(null))}
-                    </DialogContent>
-                </Dialog>
+                <DetailDialog
+                    open={detail?.open ?? false}
+                    content={detail ? renderDetail(detail.row) : null}
+                    onClose={() => setDetail((d) => d && { ...d, open: false })}
+                />
             )}
         </div>
     )

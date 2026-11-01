@@ -2,10 +2,7 @@ import { CopyIcon, MailIcon, PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import {
-  CopyText,
-  DetailList,
-} from "@/components/data-table/cells"
+import { CopyText } from "@/components/data-table/cells"
 import { DataTable } from "@/components/data-table/DataTable"
 import {
   filterKeys,
@@ -16,11 +13,6 @@ import {
   type RowAction,
 } from "@/components/data-table/types"
 import { Button } from "@/components/ui/button"
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { PERMISSIONS } from "@/constants/permissions"
 import { usePermission } from "@/hooks/usePermission"
 import { useTableParams } from "@/hooks/useTableParams"
@@ -189,41 +181,36 @@ export default function UsersPage() {
         filters={filters}
         rowActions={rowActions}
         bulkActions={bulkActions}
-        renderDetail={(u) => (
-          <>
-            <DialogHeader>
-              <DialogTitle>{t("users.detail.title")}</DialogTitle>
-              <DialogDescription>
-                {t("users.detail.description")}
-              </DialogDescription>
-            </DialogHeader>
-            <DetailList
-              items={[
-                { label: "ID", value: <CopyText value={String(u.id)} /> },
-                {
-                  label: t("users.email"),
-                  value: <CopyText value={u.email} mono={false} />,
-                },
-                {
-                  label: t("users.role"),
-                  value: <UserRoleBadge role={u.system_role} />,
-                },
-                {
-                  label: t("users.status.label"),
-                  value: <UserStatusBadge status={u.status} />,
-                },
-                {
-                  label: t("users.created"),
-                  value: formatDateTime(u.created_at),
-                },
-                {
-                  label: t("users.updated"),
-                  value: formatDateTime(u.updated_at),
-                },
-              ]}
-            />
-          </>
-        )}
+        renderDetail={(u) => ({
+          title: t("users.detail.title"),
+          description: t("users.detail.description"),
+          metadata: [
+            { label: "ID", value: <CopyText value={String(u.id)} /> },
+            {
+              label: t("users.email"),
+              value: <CopyText value={u.email} mono={false} />,
+            },
+            {
+              label: t("users.role"),
+              value: <UserRoleBadge role={u.system_role} />,
+            },
+            {
+              label: t("users.status.label"),
+              value: <UserStatusBadge status={u.status} />,
+            },
+            {
+              label: t("users.created"),
+              value: formatDateTime(u.created_at),
+            },
+            {
+              label: t("users.updated"),
+              value: formatDateTime(u.updated_at),
+            },
+          ],
+          // Optional: notes under the metadata, and buttons beside Close, e.g.
+          // sections: [{ title: "...", description: "..." }],
+          // actions: [{ id: "open", label: "...", href: `/console/system/users/${u.id}` }],
+        })}
       />
     </>
   )
