@@ -21,7 +21,7 @@ export function DataTablePagination({ params, total }: { params: TableParams; to
     const n = (v: number) => v.toLocaleString()
 
     return (
-        <div className="sticky bottom-0 z-10 flex h-9 shrink-0 items-center gap-1 bg-beyen-console-table-header text-xs text-muted-foreground">
+        <div className="px-1 sticky bottom-0 z-10 flex h-9 shrink-0 items-center gap-1 bg-beyen-console-table-header text-xs text-muted-foreground">
             <Button
                 variant="ghost"
                 size="icon-sm"

@@ -1,5 +1,5 @@
 import { InfoIcon, MoreHorizontalIcon, XIcon } from "lucide-react"
-import { Fragment, useState, type ReactNode } from "react"
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
@@ -88,6 +88,30 @@ export function DataTable<T>({
     const { t } = useTranslation()
     const [detail, setDetail] = useState<{ row: T } | null>(null)
 
+    // True while the table is cut off on the right, to show the fade there.
+    const wrapRef = useRef<HTMLDivElement>(null)
+    const [moreRight, setMoreRight] = useState(false)
+    useEffect(() => {
+        const scroller = wrapRef.current?.querySelector<HTMLElement>("[data-slot=table-container]")
+        if (!scroller) {
+            return
+        }
+        const update = () =>
+            setMoreRight(scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1)
+        update()
+        scroller.addEventListener("scroll", update, { passive: true })
+        // Both the box and the table inside it: either one changing size changes the answer.
+        const observer = new ResizeObserver(update)
+        observer.observe(scroller)
+        if (scroller.firstElementChild) {
+            observer.observe(scroller.firstElementChild)
+        }
+        return () => {
+            scroller.removeEventListener("scroll", update)
+            observer.disconnect()
+        }
+    }, [])
+
     // The selection belongs to one page of one filter set; once either changes
     // it counts as empty, so no effect is needed to reset it.
     const scope = `${params.page}|${JSON.stringify(params.filters)}`
@@ -115,7 +139,10 @@ export function DataTable<T>({
         <div className="flex min-h-full flex-col">
             <DataTableToolbar params={params} presets={presets} filters={filters} />
 
-            <div className={cn("flex-1", isFetching && !isLoading && "opacity-60 transition-opacity")}>
+            <div
+                ref={wrapRef}
+                className={cn("relative flex-1", isFetching && !isLoading && "opacity-60 transition-opacity")}
+            >
                 <Table className="table-fixed" style={{ minWidth }}>
                     <colgroup>
                         {selectable && <col style={{ width: 44 }} />}
@@ -223,7 +250,7 @@ export function DataTable<T>({
                                             </TableCell>
                                         ))}
                                         {hasRowActions && (
-                                            <TableCell className="relative p-0" onClick={(e) => e.stopPropagation()}>
+                                            <TableCell className="sticky right-0 z-10 p-0" onClick={(e) => e.stopPropagation()}>
                                                 <RowActions row={row} actions={rowActions} />
                                             </TableCell>
                                         )}
@@ -233,6 +260,15 @@ export function DataTable<T>({
                         )}
                     </TableBody>
                 </Table>
+
+                {/* Fades the right edge while more columns are scrolled out of sight. */}
+                <div
+                    aria-hidden
+                    className={cn(
+                        "pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-beyen-console-surface to-transparent transition-opacity",
+                        moreRight ? "opacity-100" : "opacity-0",
+                    )}
+                />
             </div>
 
             <DataTablePagination params={params} total={total} />
@@ -240,7 +276,7 @@ export function DataTable<T>({
             {bulkActions && selectedRows.length > 0 && (
                 // Zero height and sticky: the bar floats above the pagination without taking room.
                 <div className="sticky bottom-16 z-20 h-0">
-                    <div className="absolute bottom-0 left-1/2 flex min-w-md -translate-x-1/2 items-center justify-between gap-6 rounded-xl bg-foreground py-2 pr-2 pl-4 text-sm text-background shadow-lg">
+                    <div className="absolute bottom-0 left-1/2 flex min-w-md -translate-x-1/2 items-center justify-between gap-6 rounded-sm bg-foreground py-2 pr-2 pl-4 text-sm text-background shadow-lg">
                         <span className="whitespace-nowrap">
                             {t("dataTable.selected", { n: selectedRows.length })}
                         </span>
@@ -324,7 +360,7 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
     }
 
     return (
-        <div className="absolute top-1/2 right-2 z-10 flex -translate-y-1/2 items-center gap-0.5 rounded-lg border bg-background p-0.5 opacity-0 shadow-xs transition-opacity group-hover/row:opacity-100 focus-within:opacity-100 has-aria-expanded:opacity-100">
+        <div className="absolute top-1/2 right-2 z-10 flex -translate-y-1/2 items-center gap-0.5 rounded-sm border bg-background p-0.5 opacity-0 shadow-xs transition-opacity group-hover/row:opacity-100 focus-within:opacity-100 has-aria-expanded:opacity-100">
             {visible
                 .filter((a) => a.inline && a.icon)
                 .map((a) => (
@@ -363,6 +399,7 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
                                         key={a.id}
                                         variant={a.destructive ? "destructive" : "default"}
                                         onClick={() => a.onSelect(row)}
+                                        className="h-8"
                                     >
                                         {a.icon && <a.icon />}
                                         {a.label}
