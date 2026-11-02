@@ -91,6 +91,7 @@
     "creatorHint": "The admin who created the project. For reference only: it grants no access.",
     "created": "Created",
     "searchPlaceholder": "Part of a name",
+    "copyNames": "Copy names",
     "comment": "Comment",
     "optional": " (optional)",
     "commentPlaceholder": "Visible to admins only, up to 255 characters",

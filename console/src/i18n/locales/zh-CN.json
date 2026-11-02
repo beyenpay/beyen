@@ -91,6 +91,7 @@
     "creatorHint": "创建该项目的管理员，仅供参考，不代表拥有任何权限。",
     "created": "创建时间",
     "searchPlaceholder": "输入名称的一部分",
+    "copyNames": "复制名称",
     "comment": "备注",
     "optional": "（可选）",
     "commentPlaceholder": "仅管理员可见，最多 255 个字符",

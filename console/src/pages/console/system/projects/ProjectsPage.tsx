@@ -1,4 +1,4 @@
-import { ArchiveIcon, PlusIcon, SettingsIcon } from "lucide-react"
+import { ArchiveIcon, CopyIcon, PlusIcon, SettingsIcon } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router"
@@ -8,6 +8,7 @@ import { CopyText } from "@/components/data-table/cells"
 import { DataTable } from "@/components/data-table/DataTable"
 import {
   filterKeys,
+  type BulkAction,
   type Column,
   type FilterDef,
   type Preset,
@@ -18,6 +19,7 @@ import { PERMISSIONS } from "@/constants/permissions"
 import { usePermission } from "@/hooks/usePermission"
 import { useTableParams } from "@/hooks/useTableParams"
 import { PageActions } from "@/layouts/templates"
+import { copyText } from "@/lib/clipboard"
 import { formatDateTime } from "@/lib/format"
 import { useProjects } from "@/queries/console/system/projects"
 import { PROJECT_STATUS, type ProjectRow } from "@/types/project"
@@ -75,6 +77,13 @@ export default function ProjectsPage() {
 
   const columns: Column<ProjectRow>[] = [
     {
+      id: "id",
+      header: t("projects.id"),
+      width: 100,
+      sortKey: "id",
+      cell: (p) => p.id,
+    },
+    {
       id: "name",
       header: t("projects.name"),
       width: 240,
@@ -92,13 +101,6 @@ export default function ProjectsPage() {
             </Link>
           </span>
         ),
-    },
-    {
-      id: "id",
-      header: t("projects.id"),
-      width: 100,
-      sortKey: "id",
-      cell: (p) => p.id,
     },
     {
       id: "status",
@@ -154,6 +156,20 @@ export default function ProjectsPage() {
     },
   ]
 
+  const bulkActions: BulkAction<ProjectRow>[] = [
+    {
+      id: "copyNames",
+      label: t("projects.copyNames"),
+      icon: CopyIcon,
+      onSelect: (rows, clear) => {
+        void copyText(
+          rows.map((p) => p.name).join("\n"),
+          t("dataTable.copied")
+        ).then((ok) => ok && clear())
+      },
+    },
+  ]
+
   const table = useTableParams(filterKeys(filters))
   const { data, isPending, isFetching, isError, refetch } = useProjects({
     page: table.page,
@@ -193,6 +209,7 @@ export default function ProjectsPage() {
         presets={presets}
         filters={filters}
         rowActions={rowActions}
+        bulkActions={bulkActions}
         renderDetail={(p) => ({
           title: p.name,
           description: t("projects.detail.description"),
