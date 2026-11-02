@@ -16,6 +16,7 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
 import { getErrorMessage } from "@/lib/error-message"
 import { generatePassword } from "@/lib/password"
@@ -33,7 +34,10 @@ export function CreateUserDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent showCloseButton={false} className="gap-5 p-6 sm:max-w-md">
+            <DialogContent
+                showCloseButton={false}
+                className="max-h-[calc(100dvh-2rem)] gap-5 overflow-y-auto overscroll-contain p-6 sm:max-w-md"
+            >
                 <DialogTitle className="text-lg">{t("users.create.title")}</DialogTitle>
                 {/* The form lives inside the content, so it is unmounted on close and starts clean next time. */}
                 <CreateUserForm onDone={() => onOpenChange(false)} />
@@ -56,7 +60,7 @@ function CreateUserForm({ onDone }: { onDone: () => void }) {
         formState: { errors },
     } = useForm<CreateUserValues>({
         resolver: zodResolver(createUserSchema),
-        defaultValues: { email: "", password: "", role: "user" },
+        defaultValues: { email: "", password: "", role: "user", comment: "" },
     })
     const role = useWatch({ control, name: "role" })
 
@@ -133,6 +137,22 @@ function CreateUserForm({ onDone }: { onDone: () => void }) {
                     ) : (
                         <FieldDescription>{t("users.create.passwordHint")}</FieldDescription>
                     )}
+                </Field>
+
+                <Field data-invalid={!!errors.comment}>
+                    <FieldLabel htmlFor="new-user-comment">
+                        {t("users.comment")}
+                        <span className="font-normal text-muted-foreground">{t("users.optional")}</span>
+                    </FieldLabel>
+                    <Textarea
+                        id="new-user-comment"
+                        rows={2}
+                        className="max-h-32 min-h-16 resize-none"
+                        placeholder={t("users.commentPlaceholder")}
+                        aria-invalid={!!errors.comment}
+                        {...register("comment")}
+                    />
+                    {errors.comment && <FieldError>{fieldMessage(errors.comment.message)}</FieldError>}
                 </Field>
 
                 {create.isError && (

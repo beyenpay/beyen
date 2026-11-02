@@ -438,6 +438,9 @@ function ColumnHint({ children }: { children: ReactNode }) {
 
 // Floats over the right end of the hovered row. Stays visible while the menu
 // is open or something inside has keyboard focus.
+// A cell of that group: square-cornered so the box's own corners show, and wide
+// enough to be an easy target.
+const ACTION_CELL = "h-7 w-7 rounded-none"
 function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
     const { t } = useTranslation()
     const visible = actions.filter((a) => !a.hidden?.(row))
@@ -453,7 +456,9 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
     }
 
     return (
-        <div className="absolute top-1/2 right-2 z-10 flex -translate-y-1/2 items-center gap-0.5 rounded-sm border bg-background p-0.5 opacity-0 shadow-xs transition-opacity group-hover/row:opacity-100 focus-within:opacity-100 has-aria-expanded:opacity-100">
+        // One bordered box cut into cells: no padding around the buttons, so each
+        // button fills its cell edge to edge, and a hovered cell is filled whole.
+        <div className="absolute top-1/2 right-2 z-10 flex -translate-y-1/2 items-stretch divide-x overflow-hidden rounded-sm border bg-background opacity-0 shadow-xs transition-opacity group-hover/row:opacity-100 focus-within:opacity-100 has-aria-expanded:opacity-100">
             {visible
                 .filter((a) => a.inline && a.icon)
                 .map((a) => (
@@ -463,6 +468,7 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
                                 <Button
                                     variant="ghost"
                                     size="icon-sm"
+                                    className={ACTION_CELL}
                                     aria-label={a.label}
                                     onClick={() => a.onSelect(row)}
                                 />
@@ -476,7 +482,12 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
             <DropdownMenu>
                 <DropdownMenuTrigger
                     render={
-                        <Button variant="ghost" size="icon-sm" aria-label={t("dataTable.moreActions")} />
+                        <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className={ACTION_CELL}
+                            aria-label={t("dataTable.moreActions")}
+                        />
                     }
                 >
                     <MoreHorizontalIcon />

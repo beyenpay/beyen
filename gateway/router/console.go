@@ -65,6 +65,10 @@ func mountConsole(api *gin.RouterGroup, d Deps) {
 	// System console: platform admins only.
 	authed.GET("/system/users", middleware.RequireSystem(permission.SystemUserRead), userH.List)
 	authed.POST("/system/users", middleware.RequireSystem(permission.SystemUserWrite), userH.Create)
+	authed.PATCH("/system/users/:id", middleware.RequireSystem(permission.SystemUserWrite), userH.Update)
+	authed.DELETE("/system/users/:id", middleware.RequireSystem(permission.SystemUserWrite), userH.Delete)
+	authed.POST("/system/users/:id/restore", middleware.RequireSystem(permission.SystemUserWrite), userH.Restore)
+	authed.POST("/system/users/:id/password", middleware.RequireSystem(permission.SystemUserWrite), userH.ResetPassword)
 
 	// TEMP: probes to exercise the authz middleware. Delete once real system
 	// and project routes exist.

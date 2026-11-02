@@ -22,7 +22,10 @@
       "PROJECT_DISABLED": "该项目已被禁用。",
       "SETUP_COMPLETED": "系统已完成初始化。",
       "WEAK_PASSWORD": "密码不符合要求：8–128 位，包含字母和数字，且不能包含邮箱名称。",
-      "EMAIL_TAKEN": "该邮箱已被注册。"
+      "EMAIL_TAKEN": "该邮箱已被注册。",
+      "USER_DELETED": "该用户已被删除，请先恢复后再修改。",
+      "LAST_ADMIN": "这样会导致系统没有可用的管理员，操作已被阻止。",
+      "CANNOT_CHANGE_SELF": "不能对自己的账号执行此操作：修改角色或状态、删除、重置密码。"
     }
   },
   "site": {
@@ -88,6 +91,33 @@
     "roleHint": "管理员可以访问系统控制台，并拥有所有项目的权限。",
     "statusHint": "已禁用的账号无法登录。",
     "searchPlaceholder": "输入邮箱的一部分",
+    "comment": "备注",
+    "optional": "（可选）",
+    "commentPlaceholder": "仅管理员可见，最多 255 个字符",
+    "searchCommentPlaceholder": "输入备注的一部分",
+    "restored": "已恢复用户 {{email}}",
+    "actions": { "manage": "管理", "edit": "编辑用户", "delete": "删除用户", "restore": "恢复用户" },
+    "edit": {
+      "title": "编辑用户",
+      "status": "状态",
+      "selfHint": "不能修改自己的角色和状态。",
+      "resetPassword": "重置密码",
+      "cancelReset": "取消重置",
+      "newPassword": "新密码",
+      "resetHint": "保存后立即生效，并让该用户的所有登录失效。",
+      "cancel": "取消",
+      "save": "保存",
+      "saved": "已保存 {{email}} 的修改"
+    },
+    "delete": {
+      "title": "删除用户",
+      "confirm": "确定要删除 {{email}} 吗？",
+      "noteSignIn": "该账号将无法登录，所有已登录的会话立即失效。",
+      "noteRestore": "账号只是被标记为已删除，邮箱仍被占用；之后可以随时恢复。",
+      "cancel": "取消",
+      "submit": "删除",
+      "deleted": "已删除用户 {{email}}"
+    },
     "copyEmail": "复制邮箱",
     "copyId": "复制用户 ID",
     "copyEmails": "复制邮箱",
@@ -117,7 +147,8 @@
     "passwordTooShort": "密码至少 8 位。",
     "passwordWeak": "密码需同时包含字母和数字。",
     "confirmPasswordRequired": "请再次输入密码。",
-    "passwordMismatch": "两次输入的密码不一致。"
+    "passwordMismatch": "两次输入的密码不一致。",
+    "commentTooLong": "备注最多 255 个字符。"
   },
   "errorPage": {
     "backToConsole": "返回控制台",

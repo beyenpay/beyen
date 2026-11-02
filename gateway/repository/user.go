@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/beyenpay/beyen/gateway/model"
 )
@@ -94,6 +96,7 @@ func (s UserSort) orderBy() string {
 type UserFilter struct {
 	Email       string           // already normalized to lower case
 	EmailExact  bool             // true: equals Email, false: contains it
+	Comment     string           // substring of the comment
 	Status      model.UserStatus // 0 = any
 	Roles       []string         // any of "admin", "user" (no system role); empty = any
 	CreatedFrom int64            // unix seconds, inclusive
@@ -110,6 +113,9 @@ func (f UserFilter) apply(db *gorm.DB) *gorm.DB {
 		} else {
 			db = db.Where("email LIKE ?", "%"+likeEscaper.Replace(f.Email)+"%")
 		}
+	}
+	if f.Comment != "" {
+		db = db.Where("comment LIKE ?", "%"+likeEscaper.Replace(f.Comment)+"%")
 	}
 	if f.Status != 0 {
 		db = db.Where("status = ?", f.Status)
@@ -177,4 +183,62 @@ func (r *UserRepo) UpdatePasswordHash(ctx context.Context, id int, hash string) 
 		return fmt.Errorf("update password hash: %w", err)
 	}
 	return nil
+}
+
+// Mutate changes one user in a transaction. change gets the locked row and how
+// many other active admins there are, edits the row, and reports whether it
+// did; only then is the row saved. The saved row is returned either way.
+//
+// Every active admin row is locked first, always in id order, and then the
+// user. Two changes that touch admins therefore queue up instead of
+// deadlocking, and the admin count cannot change under change's feet, which
+// is what keeps "never remove the last admin" true under concurrency.
+//
+// ErrNotFound: no such user. ErrDuplicate: the change made the email clash.
+// Any error from change rolls everything back and is returned as it is.
+func (r *UserRepo) Mutate(ctx context.Context, id int, change func(u *model.User, otherAdmins int) (changed bool, err error)) (*model.User, error) {
+	var out model.User
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var admins []int
+		err := tx.Model(&model.User{}).
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("system_role = ? AND status = ?", model.SystemRoleAdmin, model.UserStatusActive).
+			Order("id").
+			Pluck("id", &admins).Error
+		if err != nil {
+			return fmt.Errorf("lock admins: %w", err)
+		}
+
+		err = tx.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&out, id).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrNotFound
+		}
+		if err != nil {
+			return fmt.Errorf("lock user: %w", err)
+		}
+
+		others := len(admins)
+		if slices.Contains(admins, id) {
+			others--
+		}
+		changed, err := change(&out, others)
+		if err != nil {
+			return err
+		}
+		if !changed {
+			return nil
+		}
+		err = tx.Save(&out).Error
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return ErrDuplicate
+		}
+		if err != nil {
+			return fmt.Errorf("save user: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }

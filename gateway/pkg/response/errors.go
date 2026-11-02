@@ -41,4 +41,7 @@ var (
 	ErrSetupCompleted     = Error{http.StatusConflict, CodeSetupCompleted, "setup already completed"}
 	ErrWeakPassword       = Error{http.StatusBadRequest, CodeWeakPassword, "password does not meet the policy"}
 	ErrEmailTaken         = Error{http.StatusConflict, CodeEmailTaken, "email is already registered"}
+	ErrUserDeleted        = Error{http.StatusConflict, CodeUserDeleted, "user is deleted"}
+	ErrLastAdmin          = Error{http.StatusConflict, CodeLastAdmin, "this would leave no active admin"}
+	ErrCannotChangeSelf   = Error{http.StatusConflict, CodeCannotChangeSelf, "cannot do this to your own account"}
 )

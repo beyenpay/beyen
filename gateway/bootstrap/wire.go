@@ -28,14 +28,18 @@ func buildHandler(cfg *config.Config, gdb *gorm.DB, rdb *redis.Client) http.Hand
 	memberRepo := repository.NewProjectMemberRepo(gdb)
 	cache := repository.NewCache(rdb)
 
+	authSvc := auth.New(cfg.Session, userRepo, repository.NewSessionRepo(rdb, keys), limiter)
+	meSvc := me.New(userRepo, projectRepo, memberRepo, cache, keys)
+
 	return router.New(router.Deps{
 		Config:  cfg,
 		DB:      gdb,
 		Redis:   rdb,
 		Limiter: limiter,
-		User:    user.New(userRepo),
-		Auth:    auth.New(cfg.Session, userRepo, repository.NewSessionRepo(rdb, keys), limiter),
-		Authz:   authz.New(projectRepo, memberRepo, cache, keys),
-		Me:      me.New(userRepo, projectRepo, memberRepo, cache, keys),
+		// The user service ends logins and drops the cached profile when an admin changes a user.
+		User:  user.New(userRepo, user.WithSessions(authSvc), user.WithProfiles(meSvc)),
+		Auth:  authSvc,
+		Authz: authz.New(projectRepo, memberRepo, cache, keys),
+		Me:    meSvc,
 	})
 }

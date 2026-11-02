@@ -22,7 +22,10 @@
       "PROJECT_DISABLED": "This project is disabled.",
       "SETUP_COMPLETED": "The system has already been set up.",
       "WEAK_PASSWORD": "Password does not meet the policy: 8–128 characters with a letter and a digit, and it must not contain the email name.",
-      "EMAIL_TAKEN": "This email is already registered."
+      "EMAIL_TAKEN": "This email is already registered.",
+      "USER_DELETED": "This user has been deleted. Restore them before making changes.",
+      "LAST_ADMIN": "That would leave the system without an active admin, so it was blocked.",
+      "CANNOT_CHANGE_SELF": "You can't do this to your own account: change the role or status, delete it, or reset its password."
     }
   },
   "site": {
@@ -88,6 +91,33 @@
     "roleHint": "Admins can open the system console and hold every project's permissions.",
     "statusHint": "A disabled account cannot sign in.",
     "searchPlaceholder": "Part of an email",
+    "comment": "Comment",
+    "optional": " (optional)",
+    "commentPlaceholder": "Visible to admins only, up to 255 characters",
+    "searchCommentPlaceholder": "Part of a comment",
+    "restored": "Restored {{email}}",
+    "actions": { "manage": "Manage", "edit": "Edit user", "delete": "Delete user", "restore": "Restore user" },
+    "edit": {
+      "title": "Edit user",
+      "status": "Status",
+      "selfHint": "You can't change your own role or status.",
+      "resetPassword": "Reset password",
+      "cancelReset": "Cancel reset",
+      "newPassword": "New password",
+      "resetHint": "Takes effect when you save, and signs the user out everywhere.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saved": "Saved changes to {{email}}"
+    },
+    "delete": {
+      "title": "Delete user",
+      "confirm": "Delete {{email}}?",
+      "noteSignIn": "They will no longer be able to sign in, and every session they have is ended.",
+      "noteRestore": "The account is only marked as deleted: the email stays taken, and you can restore it any time.",
+      "cancel": "Cancel",
+      "submit": "Delete",
+      "deleted": "Deleted {{email}}"
+    },
     "copyEmail": "Copy email",
     "copyId": "Copy user ID",
     "copyEmails": "Copy emails",
@@ -117,7 +147,8 @@
     "passwordTooShort": "Password must be at least 8 characters.",
     "passwordWeak": "Password must contain a letter and a digit.",
     "confirmPasswordRequired": "Confirm your password.",
-    "passwordMismatch": "The two passwords do not match."
+    "passwordMismatch": "The two passwords do not match.",
+    "commentTooLong": "The comment can be at most 255 characters."
   },
   "errorPage": {
     "backToConsole": "Back to console",

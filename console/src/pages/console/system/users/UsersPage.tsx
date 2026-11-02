@@ -1,4 +1,4 @@
-import { CopyIcon, MailIcon, PlusIcon } from "lucide-react"
+import { CopyIcon, PencilIcon, PlusIcon, RotateCcwIcon, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -13,21 +13,38 @@ import {
   type RowAction,
 } from "@/components/data-table/types"
 import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/toast"
 import { PERMISSIONS } from "@/constants/permissions"
 import { usePermission } from "@/hooks/usePermission"
 import { useTableParams } from "@/hooks/useTableParams"
 import { PageActions } from "@/layouts/templates"
 import { copyText } from "@/lib/clipboard"
 import { formatDateTime } from "@/lib/format"
-import { useUsers } from "@/queries/console/system/users"
-import type { UserRow } from "@/types/user"
+import { useMe } from "@/queries/console/auth/me"
+import { useRestoreUser, useUsers } from "@/queries/console/system/users"
+import { USER_STATUS, type UserRow } from "@/types/user"
 import { CreateUserDialog } from "./CreateUserDialog"
+import { DeleteUserDialog } from "./DeleteUserDialog"
+import { EditUserDialog } from "./EditUserDialog"
 import { UserRoleBadge, UserStatusBadge } from "@/components/common/UserBadges"
 
 export default function UsersPage() {
   const { t } = useTranslation()
   const { can } = usePermission()
+  const { data: me } = useMe()
+  const restore = useRestoreUser()
   const [creating, setCreating] = useState(false)
+  // The row stays set after closing, so the dialog keeps its content while it fades out.
+  const [dialog, setDialog] = useState<{
+    kind: "edit" | "delete"
+    user: UserRow
+    open: boolean
+  } | null>(null)
+  const closeDialog = () => setDialog((d) => d && { ...d, open: false })
+
+  const canWrite = can(PERMISSIONS.systemUserWrite)
+  const isDeleted = (u: UserRow) => u.status === USER_STATUS.deleted
+  const isSelf = (u: UserRow) => u.id === me?.user.id
 
   const filters: FilterDef[] = [
     {
@@ -35,6 +52,13 @@ export default function UsersPage() {
       key: "q",
       label: t("users.email"),
       placeholder: t("users.searchPlaceholder"),
+      ops: ["contains"],
+    },
+    {
+      type: "text",
+      key: "comment",
+      label: t("users.comment"),
+      placeholder: t("users.searchCommentPlaceholder"),
       ops: ["contains"],
     },
     {
@@ -102,6 +126,12 @@ export default function UsersPage() {
       cell: (u) => <UserStatusBadge status={u.status} />,
     },
     {
+      id: "comment",
+      header: t("users.comment"),
+      width: 220,
+      cell: (u) => u.comment || <span className="text-muted-foreground">—</span>,
+    },
+    {
       id: "created",
       header: t("users.created"),
       width: 180,
@@ -112,19 +142,34 @@ export default function UsersPage() {
 
   const rowActions: RowAction<UserRow>[] = [
     {
-      id: "copyEmail",
-      label: t("users.copyEmail"),
-      icon: MailIcon,
-      group: t("dataTable.copy"),
-      inline: true,
-      onSelect: (u) => void copyText(u.email, t("dataTable.copied")),
+      id: "edit",
+      label: t("users.actions.edit"),
+      icon: PencilIcon,
+      group: t("users.actions.manage"),
+      // A deleted user is read only until restored.
+      hidden: (u) => !canWrite || isDeleted(u),
+      onSelect: (u) => setDialog({ kind: "edit", user: u, open: true }),
     },
     {
-      id: "copyId",
-      label: t("users.copyId"),
-      icon: CopyIcon,
-      group: t("dataTable.copy"),
-      onSelect: (u) => void copyText(String(u.id), t("dataTable.copied")),
+      id: "restore",
+      label: t("users.actions.restore"),
+      icon: RotateCcwIcon,
+      group: t("users.actions.manage"),
+      hidden: (u) => !canWrite || !isDeleted(u),
+      onSelect: (u) =>
+        restore.mutate(u.id, {
+          onSuccess: () => toast.add({ type: "success", title: t("users.restored", { email: u.email }) }),
+        }),
+    },
+    {
+      id: "delete",
+      label: t("users.actions.delete"),
+      icon: Trash2Icon,
+      group: t("users.actions.manage"),
+      destructive: true,
+      // Not your own account: the gateway refuses it, so do not offer it.
+      hidden: (u) => !canWrite || isDeleted(u) || isSelf(u),
+      onSelect: (u) => setDialog({ kind: "delete", user: u, open: true }),
     },
   ]
 
@@ -160,13 +205,23 @@ export default function UsersPage() {
         </PageActions>
       )}
       <CreateUserDialog open={creating} onOpenChange={setCreating} />
-      <div className="flex flex-col gap-2 border">
-        <div>1</div>
-        <div>2</div>
-        <div>3</div>
-        <div>4</div>
-        <div>5</div>
-      </div>
+      {dialog?.kind === "edit" && (
+        <EditUserDialog
+          key={dialog.user.id}
+          user={dialog.user}
+          isSelf={isSelf(dialog.user)}
+          open={dialog.open}
+          onOpenChange={(open) => !open && closeDialog()}
+        />
+      )}
+      {dialog?.kind === "delete" && (
+        <DeleteUserDialog
+          key={dialog.user.id}
+          user={dialog.user}
+          open={dialog.open}
+          onOpenChange={(open) => !open && closeDialog()}
+        />
+      )}
       <DataTable
         columns={columns}
         rows={data?.items ?? []}
@@ -197,6 +252,10 @@ export default function UsersPage() {
             {
               label: t("users.status.label"),
               value: <UserStatusBadge status={u.status} />,
+            },
+            {
+              label: t("users.comment"),
+              value: u.comment || "—",
             },
             {
               label: t("users.created"),

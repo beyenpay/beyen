@@ -23,9 +23,12 @@ const (
 const (
 	CodeInvalidCredentials = "INVALID_CREDENTIALS" // wrong email or password
 	CodeAccountDisabled    = "ACCOUNT_DISABLED"
-	CodeTooManyAttempts    = "TOO_MANY_ATTEMPTS" // login attempts throttled
-	CodeProjectDisabled    = "PROJECT_DISABLED"  // the project is frozen by a platform admin
-	CodeSetupCompleted     = "SETUP_COMPLETED"   // first-run setup attempted while users already exist
-	CodeWeakPassword       = "WEAK_PASSWORD"     // new password breaks the password policy
-	CodeEmailTaken         = "EMAIL_TAKEN"       // creating a user whose email is already registered
+	CodeTooManyAttempts    = "TOO_MANY_ATTEMPTS"  // login attempts throttled
+	CodeProjectDisabled    = "PROJECT_DISABLED"   // the project is frozen by a platform admin
+	CodeSetupCompleted     = "SETUP_COMPLETED"    // first-run setup attempted while users already exist
+	CodeWeakPassword       = "WEAK_PASSWORD"      // new password breaks the password policy
+	CodeEmailTaken         = "EMAIL_TAKEN"        // creating a user whose email is already registered
+	CodeUserDeleted        = "USER_DELETED"       // changing a user who has been deleted
+	CodeLastAdmin          = "LAST_ADMIN"         // the change would leave no active platform admin
+	CodeCannotChangeSelf   = "CANNOT_CHANGE_SELF" // role, status, delete or password reset aimed at the caller's own account
 )

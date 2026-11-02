@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/beyenpay/beyen/gateway/model"
 	"github.com/beyenpay/beyen/gateway/pkg/email"
@@ -20,22 +21,48 @@ var (
 	ErrEmailTaken     = errors.New("email is already registered")
 	ErrInvalidRole    = errors.New("invalid system role")
 	ErrInvalidSort    = errors.New("invalid sort field")
+	ErrInvalidStatus  = errors.New("invalid status")
+	ErrInvalidComment = errors.New("comment is too long")
+	ErrUserDeleted    = errors.New("user is deleted")
+	ErrLastAdmin      = errors.New("this would leave no active admin")
+	ErrSelfChange     = errors.New("cannot change your own role or status, delete yourself or reset your own password here")
 	ErrWeakPassword   = errors.New("weak password") // wrapped with the reason
 	ErrNotFound       = errors.New("user not found")
 	ErrSetupCompleted = errors.New("setup already completed")
 )
 
 type Service struct {
-	users   *repository.UserRepo
-	setupMu sync.Mutex // serializes first-admin creation within this process
+	users    *repository.UserRepo
+	sessions SessionRevoker     // nil in tools that run without Redis, such as cmd/createuser
+	profiles ProfileInvalidator // same
+	setupMu  sync.Mutex         // serializes first-admin creation within this process
 }
 
-func New(users *repository.UserRepo) *Service { return &Service{users: users} }
+func New(users *repository.UserRepo, opts ...Option) *Service {
+	s := &Service{users: users}
+	for _, o := range opts {
+		o(s)
+	}
+	return s
+}
+
+// maxCommentLen counts characters, not bytes. It matches the column size.
+const maxCommentLen = 255
+
+// normalizeComment trims the note and checks its length.
+func normalizeComment(c string) (string, error) {
+	c = strings.TrimSpace(c)
+	if utf8.RuneCountInString(c) > maxCommentLen {
+		return "", ErrInvalidComment
+	}
+	return c, nil
+}
 
 type CreateInput struct {
 	Email      string
 	Password   string
 	SystemRole model.SystemRole // empty for a normal user
+	Comment    string           // optional note
 }
 
 // Create validates the input and stores a new active user. Callers decide who
@@ -47,6 +74,10 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (*model.User, erro
 	}
 	if in.SystemRole != "" && !in.SystemRole.Valid() {
 		return nil, ErrInvalidRole
+	}
+	comment, err := normalizeComment(in.Comment)
+	if err != nil {
+		return nil, err
 	}
 	if err := validatePassword(addr, in.Password); err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrWeakPassword, err)
@@ -62,6 +93,7 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (*model.User, erro
 		PasswordHash: hash,
 		Status:       model.UserStatusActive,
 		SystemRole:   in.SystemRole,
+		Comment:      comment,
 	}
 	if err := s.users.Create(ctx, u); err != nil {
 		if errors.Is(err, repository.ErrDuplicate) {
@@ -93,6 +125,7 @@ type ListInput struct {
 	SortDesc       bool
 	Email          string // substring, or the whole address when EmailExact
 	EmailExact     bool
+	Comment        string // substring of the note
 	Status         model.UserStatus
 	Roles          []string // any of "admin", "user"; empty means any
 	CreatedFrom    int64
@@ -121,6 +154,7 @@ func (s *Service) List(ctx context.Context, in ListInput) (*ListResult, error) {
 	users, total, err := s.users.List(ctx, repository.UserSort{Key: in.Sort, Desc: in.SortDesc}, repository.UserFilter{
 		Email:       email.Normalize(in.Email),
 		EmailExact:  in.EmailExact,
+		Comment:     strings.TrimSpace(in.Comment),
 		Status:      in.Status,
 		Roles:       in.Roles,
 		CreatedFrom: in.CreatedFrom,
