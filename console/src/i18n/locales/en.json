@@ -83,6 +83,41 @@
     "error": "Failed to load.",
     "retry": "Try again"
   },
+  "projects": {
+    "name": "Name",
+    "id": "ID",
+    "status": { "label": "Status", "active": "Active", "disabled": "Frozen", "deleted": "Deleted" },
+    "creator": "Created by",
+    "creatorHint": "The admin who created the project. For reference only: it grants no access.",
+    "created": "Created",
+    "searchPlaceholder": "Part of a name",
+    "comment": "Comment",
+    "optional": " (optional)",
+    "commentPlaceholder": "Visible to admins only, up to 255 characters",
+    "searchCommentPlaceholder": "Part of a comment",
+    "presets": { "all": "All", "active": "Active", "disabled": "Frozen", "deleted": "Deleted" },
+    "actions": { "settings": "Project settings", "delete": "Delete project" },
+    "detail": { "title": "Project details", "description": "Inspect this project's basic information." },
+    "create": {
+      "button": "Create project",
+      "title": "Create a new project",
+      "description": "Projects are separate workspaces. Members of a project share its API keys, customers and payments.",
+      "name": "Name",
+      "nameHint": "A friendly name for the project, shown across the console.",
+      "cancel": "Cancel",
+      "submit": "Create",
+      "created": "Created project {{name}}"
+    },
+    "delete": {
+      "title": "Delete {{name}}",
+      "warning": "Deleting removes access for every member of this project, yourself included, and every request made with its API keys is rejected. A deleted project cannot be restored.",
+      "confirmPrompt": "To confirm, type \"{{name}}\" in the box",
+      "placeholder": "Type the project's name",
+      "cancel": "Cancel",
+      "submit": "Delete",
+      "deleted": "Deleted project {{name}}"
+    }
+  },
   "users": {
     "email": "Email",
     "role": "Role",
@@ -148,7 +183,9 @@
     "passwordWeak": "Password must contain a letter and a digit.",
     "confirmPasswordRequired": "Confirm your password.",
     "passwordMismatch": "The two passwords do not match.",
-    "commentTooLong": "The comment can be at most 255 characters."
+    "commentTooLong": "The comment can be at most 255 characters.",
+    "projectNameRequired": "Enter a project name.",
+    "projectNameTooLong": "The name can be at most 128 characters."
   },
   "errorPage": {
     "backToConsole": "Back to console",

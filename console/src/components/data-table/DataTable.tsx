@@ -454,6 +454,8 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
         const name = a.group ?? ""
         groups.set(name, [...(groups.get(name) ?? []), a])
     }
+    // When every action has its own button there is nothing left for the menu.
+    const showMenu = visible.some((a) => !(a.inline && a.icon))
 
     return (
         // One bordered box cut into cells: no padding around the buttons, so each
@@ -468,7 +470,10 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
                                 <Button
                                     variant="ghost"
                                     size="icon-sm"
-                                    className={ACTION_CELL}
+                                    className={cn(
+                                        ACTION_CELL,
+                                        a.destructive && "text-destructive hover:text-destructive",
+                                    )}
                                     aria-label={a.label}
                                     onClick={() => a.onSelect(row)}
                                 />
@@ -479,6 +484,7 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
                         <TooltipContent>{a.label}</TooltipContent>
                     </Tooltip>
                 ))}
+            {showMenu && (
             <DropdownMenu>
                 <DropdownMenuTrigger
                     render={
@@ -514,6 +520,7 @@ function RowActions<T>({ row, actions }: { row: T; actions: RowAction<T>[] }) {
                     ))}
                 </DropdownMenuContent>
             </DropdownMenu>
+            )}
         </div>
     )
 }

@@ -83,6 +83,41 @@
     "error": "加载失败。",
     "retry": "重试"
   },
+  "projects": {
+    "name": "名称",
+    "id": "ID",
+    "status": { "label": "状态", "active": "正常", "disabled": "已冻结", "deleted": "已删除" },
+    "creator": "创建者",
+    "creatorHint": "创建该项目的管理员，仅供参考，不代表拥有任何权限。",
+    "created": "创建时间",
+    "searchPlaceholder": "输入名称的一部分",
+    "comment": "备注",
+    "optional": "（可选）",
+    "commentPlaceholder": "仅管理员可见，最多 255 个字符",
+    "searchCommentPlaceholder": "输入备注的一部分",
+    "presets": { "all": "全部", "active": "正常", "disabled": "已冻结", "deleted": "已删除" },
+    "actions": { "settings": "项目设置", "delete": "删除项目" },
+    "detail": { "title": "项目详情", "description": "查看该项目的基本信息。" },
+    "create": {
+      "button": "创建项目",
+      "title": "创建新项目",
+      "description": "项目是相互独立的工作空间，项目成员共享其 API 密钥、客户和支付数据。",
+      "name": "名称",
+      "nameHint": "项目的易读名称，会显示在控制台的各处。",
+      "cancel": "取消",
+      "submit": "创建",
+      "created": "已创建项目 {{name}}"
+    },
+    "delete": {
+      "title": "删除 {{name}}",
+      "warning": "删除后，该项目的所有成员（包括你自己）都将失去访问权限，使用其 API 密钥的所有请求都会被拒绝。已删除的项目无法恢复。",
+      "confirmPrompt": "请在下方输入框中输入 \"{{name}}\" 以确认",
+      "placeholder": "输入项目名称",
+      "cancel": "取消",
+      "submit": "删除",
+      "deleted": "已删除项目 {{name}}"
+    }
+  },
   "users": {
     "email": "邮箱",
     "role": "角色",
@@ -148,7 +183,9 @@
     "passwordWeak": "密码需同时包含字母和数字。",
     "confirmPasswordRequired": "请再次输入密码。",
     "passwordMismatch": "两次输入的密码不一致。",
-    "commentTooLong": "备注最多 255 个字符。"
+    "commentTooLong": "备注最多 255 个字符。",
+    "projectNameRequired": "请输入项目名称。",
+    "projectNameTooLong": "项目名称最多 128 个字符。"
   },
   "errorPage": {
     "backToConsole": "返回控制台",

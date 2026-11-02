@@ -21,6 +21,7 @@ const maxNameLen = 128 // characters; the projects.name column size
 
 var (
 	ErrInvalidName     = errors.New("project name must be 1 to 128 characters")
+	ErrInvalidComment  = errors.New("comment is too long")
 	ErrInvalidRole     = errors.New("invalid project role")
 	ErrProjectNotFound = errors.New("project not found")
 	ErrUserNotFound    = errors.New("user not found")
@@ -39,14 +40,29 @@ func New(projects *repository.ProjectRepo, members *repository.ProjectMemberRepo
 	return &Service{projects: projects, members: members, users: users, authz: authz}
 }
 
-// Create stores a new active project.
+// maxCommentLen counts characters, not bytes. It matches the column size.
+const maxCommentLen = 255
+
+// Create stores a new active project that no user is credited with, as the
+// command-line tool does.
 func (s *Service) Create(ctx context.Context, name string) (*model.Project, error) {
+	return s.CreateBy(ctx, name, "", 0)
+}
+
+// CreateBy stores a new active project and records which admin made it. That is
+// for reference only and grants nothing: admins reach every project anyway.
+// The comment is an optional note.
+func (s *Service) CreateBy(ctx context.Context, name, comment string, createdBy int) (*model.Project, error) {
 	name = strings.TrimSpace(name)
 	if n := utf8.RuneCountInString(name); n < 1 || n > maxNameLen {
 		return nil, ErrInvalidName
 	}
+	comment = strings.TrimSpace(comment)
+	if utf8.RuneCountInString(comment) > maxCommentLen {
+		return nil, ErrInvalidComment
+	}
 
-	p := &model.Project{Name: name, Status: model.ProjectStatusActive}
+	p := &model.Project{Name: name, Comment: comment, Status: model.ProjectStatusActive, CreatedBy: createdBy}
 	if err := s.projects.Create(ctx, p); err != nil {
 		return nil, err
 	}

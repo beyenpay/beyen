@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router"
 import { PERMISSIONS } from "@/constants/permissions"
 import { useCurrentProject } from "@/hooks/useCurrentProject"
 import { usePermission } from "@/hooks/usePermission"
+import { CreateProjectDialog } from "@/pages/console/system/projects/CreateProjectDialog"
 import { useProjectStore } from "@/stores/project"
 
 export default function ProjectSwitcher() {
@@ -20,6 +21,7 @@ export default function ProjectSwitcher() {
     const navigate = useNavigate()
     const { pathname } = useLocation()
     const [open, setOpen] = useState(false)
+    const [creating, setCreating] = useState(false)
 
     function switchProject(id: number) {
         setCurrentProjectId(id)
@@ -38,6 +40,14 @@ export default function ProjectSwitcher() {
         }
     }
     const ref = useRef<HTMLDivElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
+
+    // A long list opens on the current project, not at the top.
+    useEffect(() => {
+        if (open) {
+            listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: "nearest" })
+        }
+    }, [open])
 
     useEffect(() => {
         if (!open) return
@@ -62,6 +72,7 @@ export default function ProjectSwitcher() {
     const canManage = can(PERMISSIONS.systemProjectRead)
 
     return (
+        <>
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen((v) => !v)}
@@ -73,13 +84,16 @@ export default function ProjectSwitcher() {
             </button>
 
             {open && (
-                <div className="absolute left-0 top-full z-50 mt-2 w-60 rounded-2xl border bg-beyen-console-menu p-2 text-beyen-console-foreground shadow-lg">
-                    <div className="px-3 py-1.5 uppercase tracking-wider text-muted-foreground text-[10px]">
+                <div className="absolute left-0 top-full z-50 mt-2 flex w-60 flex-col rounded-2xl border bg-beyen-console-menu p-2 text-beyen-console-foreground shadow-lg">
+                    <div className="shrink-0 px-3 py-1.5 uppercase tracking-wider text-muted-foreground text-[10px]">
                         Projects
                     </div>
+                    {/* A fixed height: past it, the list scrolls inside; the heading above and the actions below stay in view. */}
+                    <div ref={listRef} className="max-h-72 overflow-y-auto overscroll-contain">
                     {projects.map((p) => (
                         <button
                             key={p.id}
+                            aria-current={current?.id === p.id ? "true" : undefined}
                             onClick={() => {
                                 switchProject(p.id)
                                 setOpen(false)
@@ -89,22 +103,29 @@ export default function ProjectSwitcher() {
                             <Check
                                 className={`size-3.5 shrink-0 ${current?.id === p.id ? "" : "invisible"}`}
                             />
-                            {p.name}
+                            <span className="min-w-0 truncate">{p.name}</span>
                             {/* 1 is the gateway's ProjectStatusActive */}
                             {p.status !== 1 && (
-                                <span className="ml-auto text-xs text-muted-foreground">
+                                <span className="ml-auto shrink-0 text-xs text-muted-foreground">
                                     {t("project.disabled")}
                                 </span>
                             )}
                         </button>
                     ))}
+                    </div>
 
                     {(canCreate || canManage) && (
                         <>
-                            <div className="my-1 border-t" />
+                            <div className="my-1 shrink-0 border-t" />
 
                             {canCreate && (
-                                <button className={itemCls} onClick={() => setOpen(false)}>
+                                <button
+                                    className={itemCls}
+                                    onClick={() => {
+                                        setOpen(false)
+                                        setCreating(true)
+                                    }}
+                                >
                                     <Plus className="size-4 shrink-0" />
                                     Create project
                                 </button>
@@ -126,5 +147,17 @@ export default function ProjectSwitcher() {
                 </div>
             )}
         </div>
+        {/* Outside the menu's box: the dialog is portaled, and a click in it must not count as "outside". */}
+        <CreateProjectDialog
+            open={creating}
+            onOpenChange={setCreating}
+            // The list behind the switcher is already refreshed when this runs, so the
+            // settings page finds the new project among the caller's projects.
+            onCreated={(p) => {
+                setCurrentProjectId(p.id)
+                navigate(`/console/settings/${p.id}/general`)
+            }}
+        />
+        </>
     )
 }

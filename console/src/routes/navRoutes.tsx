@@ -15,6 +15,7 @@ const PAGES: Record<string, LazyExoticComponent<ComponentType>> = {
     "/console/customers": lazy(() => import("@/pages/console/project/customers/CustomersPage")),
     "/console/developer/api-keys": lazy(() => import("@/pages/console/project/developer/ApiKeysPage")),
     "/console/system/users": lazy(() => import("@/pages/console/system/users/UsersPage")),
+    "/console/system/projects": lazy(() => import("@/pages/console/system/projects/ProjectsPage")),
     "/console/system/overview": lazy(() => import("@/pages/console/system/overview/SystemOverviewPage"))
 }
 

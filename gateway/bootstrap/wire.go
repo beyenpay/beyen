@@ -14,6 +14,7 @@ import (
 	"github.com/beyenpay/beyen/gateway/service/auth"
 	"github.com/beyenpay/beyen/gateway/service/authz"
 	"github.com/beyenpay/beyen/gateway/service/me"
+	"github.com/beyenpay/beyen/gateway/service/project"
 	"github.com/beyenpay/beyen/gateway/service/user"
 )
 
@@ -30,6 +31,7 @@ func buildHandler(cfg *config.Config, gdb *gorm.DB, rdb *redis.Client) http.Hand
 
 	authSvc := auth.New(cfg.Session, userRepo, repository.NewSessionRepo(rdb, keys), limiter)
 	meSvc := me.New(userRepo, projectRepo, memberRepo, cache, keys)
+	authzSvc := authz.New(projectRepo, memberRepo, cache, keys)
 
 	return router.New(router.Deps{
 		Config:  cfg,
@@ -37,9 +39,10 @@ func buildHandler(cfg *config.Config, gdb *gorm.DB, rdb *redis.Client) http.Hand
 		Redis:   rdb,
 		Limiter: limiter,
 		// The user service ends logins and drops the cached profile when an admin changes a user.
-		User:  user.New(userRepo, user.WithSessions(authSvc), user.WithProfiles(meSvc)),
-		Auth:  authSvc,
-		Authz: authz.New(projectRepo, memberRepo, cache, keys),
-		Me:    meSvc,
+		User:    user.New(userRepo, user.WithSessions(authSvc), user.WithProfiles(meSvc)),
+		Project: project.New(projectRepo, memberRepo, userRepo, authzSvc),
+		Auth:    authSvc,
+		Authz:   authzSvc,
+		Me:      meSvc,
 	})
 }

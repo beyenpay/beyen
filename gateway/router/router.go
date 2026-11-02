@@ -16,6 +16,7 @@ import (
 	"github.com/beyenpay/beyen/gateway/service/auth"
 	"github.com/beyenpay/beyen/gateway/service/authz"
 	"github.com/beyenpay/beyen/gateway/service/me"
+	"github.com/beyenpay/beyen/gateway/service/project"
 	"github.com/beyenpay/beyen/gateway/service/user"
 	"github.com/beyenpay/x/logger"
 )
@@ -29,6 +30,7 @@ type Deps struct {
 	Me      *me.Service
 	Authz   *authz.Service
 	User    *user.Service
+	Project *project.Service
 	Limiter *ratelimit.Limiter
 }
 

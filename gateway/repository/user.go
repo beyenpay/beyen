@@ -242,3 +242,24 @@ func (r *UserRepo) Mutate(ctx context.Context, id int, change func(u *model.User
 	}
 	return &out, nil
 }
+
+// EmailsByIDs returns the email of each user that exists; ids without a user
+// are left out of the map.
+func (r *UserRepo) EmailsByIDs(ctx context.Context, ids []int) (map[int]string, error) {
+	out := make(map[int]string, len(ids))
+	if len(ids) == 0 {
+		return out, nil
+	}
+	var rows []struct {
+		ID    int
+		Email string
+	}
+	err := r.db.WithContext(ctx).Model(&model.User{}).Select("id, email").Where("id IN ?", ids).Scan(&rows).Error
+	if err != nil {
+		return nil, fmt.Errorf("get user emails: %w", err)
+	}
+	for _, row := range rows {
+		out[row.ID] = row.Email
+	}
+	return out, nil
+}
