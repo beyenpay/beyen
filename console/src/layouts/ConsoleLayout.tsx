@@ -88,7 +88,7 @@ export function ConsoleLayout() {
                             onClick={toggleCollapsed}
                             aria-label="Toggle sidebar"
                             aria-expanded={!collapsed}
-                            className={`ml-auto rounded-md p-2 transition-[margin] duration-200 hover:bg-beyen-console-sidebar-active ${collapsed ? "mr-0.75" : ""}`}
+                            className={`ml-auto shrink-0 rounded-md p-2 transition-[margin] duration-200 hover:bg-beyen-console-sidebar-active ${collapsed ? "mr-0.75" : ""}`}
                         >
                             <PanelLeft className="size-4.5" />
                         </button>

@@ -73,14 +73,15 @@ export default function ProjectSwitcher() {
 
     return (
         <>
-        <div ref={ref} className="relative">
+        <div ref={ref} className="relative min-w-0">
             <button
                 onClick={() => setOpen((v) => !v)}
-                className={`flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-beyen-console-sidebar-active ${open ? "bg-beyen-console-sidebar-active" : ""
+                title={current?.name}
+                className={`flex max-w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-beyen-console-sidebar-active ${open ? "bg-beyen-console-sidebar-active" : ""
                     }`}
             >
-                {current?.name ?? t("project.none")}
-                <ChevronsUpDown className="size-4" />
+                <span className="min-w-0 truncate">{current?.name ?? t("project.none")}</span>
+                <ChevronsUpDown className="size-4 shrink-0" />
             </button>
 
             {open && (
