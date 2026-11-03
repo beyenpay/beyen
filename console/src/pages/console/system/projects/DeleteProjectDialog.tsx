@@ -50,11 +50,11 @@ export function DeleteProjectDialog({
                 className="max-h-[calc(100dvh-2rem)] gap-5 overflow-y-auto overscroll-contain p-6 sm:max-w-md"
             >
                 <div className="grid gap-3">
-                    <DialogTitle className="text-lg break-words">
+                    <DialogTitle className="text-lg wrap-break-word">
                         {t("projects.delete.title", { name: project.name })}
                     </DialogTitle>
                     <DialogDescription>{t("projects.delete.warning")}</DialogDescription>
-                    <p className="text-sm font-medium break-words">
+                    <p className="text-sm font-medium wrap-break-word">
                         {t("projects.delete.confirmPrompt", { name: project.name })}
                     </p>
                 </div>
