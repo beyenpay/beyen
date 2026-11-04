@@ -121,9 +121,10 @@ const SYSTEM_NAV: NavSection[] = [
         label: "nav.instance",
         permission: PERMISSIONS.systemInstanceRead,
         tabs: [
-            { path: "smtp", label: "nav.instanceSmtp" },
-            { path: "alert", label: "nav.instanceAlert" },
-            { path: "others", label: "nav.instanceOthers" },
+            { path: "general", label: "nav.instanceGeneral" },
+            { path: "business", label: "nav.instanceBusiness" },
+            { path: "integrations", label: "nav.instanceIntegrations" },
+            { path: "system", label: "nav.instanceSystem" },
         ],
     },
 ]

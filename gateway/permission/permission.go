@@ -52,6 +52,6 @@ const (
 
 	SystemHealthRead Permission = "system.health:read" // Health Monitoring
 
-	SystemInstanceRead  Permission = "system.instance:read" // Instance Settings: SMTP, Alert, Others
+	SystemInstanceRead  Permission = "system.instance:read" // Instance Settings: General, Business, Integrations, System
 	SystemInstanceWrite Permission = "system.instance:write"
 )
